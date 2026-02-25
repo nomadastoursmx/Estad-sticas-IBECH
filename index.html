@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IBECH - Instituto de Bomberos del Estado de Chiapas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --rojo:#c0392b; --rojo-oscuro:#96281b; --rojo-claro:#e74c3c;
+      --negro:#1a1a1a; --amarillo:#f39c12;
+    }
+    body { font-family:'Source Sans 3',sans-serif; background:#1a1a1a; color:#e0e0e0; min-height:100vh; }
+
+    /* NAVBAR */
+    .navbar-bomberos { background:linear-gradient(135deg,#1a0000,#2d0404,#1a0000); border-bottom:3px solid var(--rojo); box-shadow:0 4px 20px rgba(192,57,43,.4); padding:0; }
+    .navbar-brand-wrap { display:flex; align-items:center; gap:14px; padding:10px 20px; }
+    .brand-logo { width:54px; height:54px; border-radius:50%; object-fit:cover; border:2px solid var(--rojo); box-shadow:0 0 15px rgba(192,57,43,.6); flex-shrink:0; background:#2d0404; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .brand-logo img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+    .brand-logo-fallback { font-size:26px; }
+    .brand-text h1 { font-family:'Oswald',sans-serif; font-size:1.15rem; color:#fff; margin:0; letter-spacing:1.5px; text-transform:uppercase; line-height:1.2; }
+    .brand-text small { font-size:.68rem; color:#bbb; letter-spacing:1px; text-transform:uppercase; }
+
+    .comandancia-selector { background:rgba(192,57,43,.12); border:1px solid rgba(192,57,43,.3); border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:8px; }
+    .comandancia-selector label { color:#aaa; font-size:.72rem; font-family:'Oswald',sans-serif; letter-spacing:1px; text-transform:uppercase; margin:0; white-space:nowrap; }
+    .comandancia-selector select { background:transparent; border:none; color:#fff; font-family:'Oswald',sans-serif; font-size:.85rem; outline:none; cursor:pointer; }
+    .comandancia-selector select option { background:#1a0000; }
+
+    .nav-tabs-bomberos { border:none; padding:0 10px; }
+    .nav-tabs-bomberos .nav-link { font-family:'Oswald',sans-serif; font-size:.82rem; letter-spacing:1px; text-transform:uppercase; color:#aaa; border:none; border-bottom:3px solid transparent; padding:12px 14px; border-radius:0; transition:all .2s; background:transparent; }
+    .nav-tabs-bomberos .nav-link:hover { color:#fff; border-bottom-color:var(--rojo-claro); background:rgba(192,57,43,.1); }
+    .nav-tabs-bomberos .nav-link.active { color:#fff; border-bottom-color:var(--rojo); background:rgba(192,57,43,.15); }
+    .nav-tabs-bomberos .nav-link i { margin-right:5px; }
+
+    /* MAIN */
+    .main-content { background:#1e1e1e; min-height:calc(100vh - 90px); }
+    .section-header { background:linear-gradient(90deg,#2d0404,#1a0000); border-left:5px solid var(--rojo); padding:16px 24px; margin-bottom:20px; }
+    .section-header h2 { font-family:'Oswald',sans-serif; font-size:1.3rem; color:#fff; margin:0; letter-spacing:2px; text-transform:uppercase; }
+    .section-header p { margin:4px 0 0; color:#aaa; font-size:.83rem; }
+
+    /* CARDS */
+    .card-dark { background:#252525; border:1px solid #333; border-radius:8px; overflow:hidden; }
+    .card-dark .card-header { background:#2d0404; border-bottom:1px solid #3d0606; color:#fff; font-family:'Oswald',sans-serif; font-size:.88rem; letter-spacing:1px; text-transform:uppercase; padding:10px 16px; }
+    .card-dark .card-header i { color:var(--rojo-claro); margin-right:8px; }
+    .card-dark .card-body { padding:1rem; }
+    .card-module { background:#252525; border:1px solid #3a3a3a; border-radius:8px; border-top:3px solid #555; overflow:hidden; transition:border-top-color .2s; }
+    .card-module:hover { border-top-color:var(--rojo); }
+    .card-module .module-header { padding:14px 16px; display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none; }
+    .card-module .module-title { font-family:'Oswald',sans-serif; font-size:1rem; color:#fff; margin:0; letter-spacing:1px; text-transform:uppercase; }
+    .card-module .module-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+
+    /* FORMS */
+    .form-label { color:#ccc; font-size:.8rem; font-weight:600; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+    .form-control,.form-select { background:#1a1a1a; border:1px solid #444; color:#e0e0e0; border-radius:5px; font-size:.88rem; }
+    .form-control:focus,.form-select:focus { background:#1a1a1a; border-color:var(--rojo); color:#e0e0e0; box-shadow:0 0 0 3px rgba(192,57,43,.2); }
+    .form-control::placeholder { color:#555; }
+    .form-select option { background:#1a1a1a; }
+
+    .cat-badge { display:inline-block; background:var(--rojo-oscuro); color:#fff; font-family:'Oswald',sans-serif; font-size:.68rem; letter-spacing:1px; text-transform:uppercase; padding:2px 8px; border-radius:3px; margin-bottom:8px; }
+    .num-group label { font-size:.68rem; color:#999; margin-bottom:2px; line-height:1.2; min-height:30px; display:flex; align-items:flex-end; }
+    .num-group .form-control { text-align:center; padding:4px; font-size:.83rem; }
+
+    /* BUTTONS */
+    .btn-fire { background:linear-gradient(135deg,var(--rojo),var(--rojo-oscuro)); color:#fff; border:none; font-family:'Oswald',sans-serif; letter-spacing:1.5px; text-transform:uppercase; padding:9px 26px; border-radius:5px; transition:all .2s; box-shadow:0 4px 15px rgba(192,57,43,.3); }
+    .btn-fire:hover { background:linear-gradient(135deg,var(--rojo-claro),var(--rojo)); color:#fff; transform:translateY(-1px); }
+    .btn-outline-fire { border:1px solid var(--rojo); color:var(--rojo-claro); background:transparent; font-family:'Oswald',sans-serif; letter-spacing:1px; text-transform:uppercase; transition:all .2s; }
+    .btn-outline-fire:hover { background:rgba(192,57,43,.15); color:#fff; border-color:var(--rojo-claro); }
+    .btn-secondary-dark { background:#333; color:#ccc; border:1px solid #444; font-family:'Oswald',sans-serif; letter-spacing:1px; text-transform:uppercase; }
+    .btn-secondary-dark:hover { background:#444; color:#fff; }
+
+    /* TABLE */
+    .table-dark-custom { color:#ddd; font-size:.8rem; }
+    .table-dark-custom thead th { background:#2d0404; color:#fff; font-family:'Oswald',sans-serif; font-size:.73rem; letter-spacing:.5px; text-transform:uppercase; border-color:#3d0606; padding:8px 10px; vertical-align:middle; }
+    .table-dark-custom tbody tr { border-color:#333; transition:background .15s; }
+    .table-dark-custom tbody tr:hover { background:rgba(192,57,43,.07); }
+    .table-dark-custom td { border-color:#333; vertical-align:middle; padding:6px 10px; }
+    .table-dark-custom tbody tr:nth-child(even) { background:rgba(255,255,255,.02); }
+
+    /* STAT CARDS */
+    .stat-card { background:#252525; border:1px solid #333; border-radius:8px; padding:16px; text-align:center; border-top:3px solid var(--rojo); transition:transform .2s; }
+    .stat-card:hover { transform:translateY(-3px); }
+    .stat-card .stat-number { font-family:'Oswald',sans-serif; font-size:2rem; color:var(--rojo-claro); line-height:1; }
+    .stat-card .stat-label { font-size:.72rem; color:#888; text-transform:uppercase; letter-spacing:1px; margin-top:4px; }
+    .stat-card i { font-size:1.6rem; color:#444; margin-bottom:6px; }
+
+    /* MISC */
+    .divider-fire { border:none; height:1px; background:linear-gradient(90deg,transparent,var(--rojo),transparent); margin:16px 0; }
+    .alert-success-dark { background:rgba(39,174,96,.15); border:1px solid #27ae60; color:#2ecc71; font-size:.88rem; }
+    .badge-fire { background:var(--rojo); font-size:.68rem; }
+    .badge-ok { background:#27ae60; font-size:.68rem; }
+    .badge-warn { background:var(--amarillo); color:#000; font-size:.68rem; }
+    .badge-info { background:#2980b9; font-size:.68rem; }
+
+    /* PERSONAL CARDS */
+    .personal-card { background:#2a2a2a; border:1px solid #3a3a3a; border-radius:8px; padding:14px; transition:all .2s; position:relative; }
+    .personal-card:hover { border-color:var(--rojo); background:#2f2020; }
+    .personal-card .cargo-badge { font-family:'Oswald',sans-serif; font-size:.68rem; letter-spacing:1px; text-transform:uppercase; padding:2px 8px; border-radius:3px; background:#3d0606; color:#ff9999; }
+    .personal-card .nombre { font-family:'Oswald',sans-serif; font-size:1rem; color:#fff; }
+    .personal-card .detail { font-size:.78rem; color:#888; }
+    .personal-card .delete-btn { position:absolute; top:10px; right:10px; background:transparent; border:1px solid #555; color:#888; width:26px; height:26px; border-radius:4px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; font-size:.8rem; padding:0; }
+    .personal-card .delete-btn:hover { background:var(--rojo); border-color:var(--rojo); color:#fff; }
+
+    /* UNIDAD CARDS */
+    .unidad-card { background:#2a2a2a; border:1px solid #3a3a3a; border-radius:8px; padding:14px; transition:all .2s; position:relative; }
+    .unidad-card:hover { border-color:#2980b9; }
+    .unidad-card .unidad-nombre { font-family:'Oswald',sans-serif; font-size:.95rem; color:#fff; }
+    .unidad-card .detail { font-size:.78rem; color:#888; }
+    .unidad-card .delete-btn { position:absolute; top:10px; right:10px; background:transparent; border:1px solid #555; color:#888; width:26px; height:26px; border-radius:4px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; font-size:.8rem; padding:0; }
+    .unidad-card .delete-btn:hover { background:var(--rojo); border-color:var(--rojo); color:#fff; }
+
+    /* SEARCH AUTOCOMPLETE */
+    .autocomplete-list { position:absolute; z-index:1000; background:#252525; border:1px solid #444; border-radius:0 0 6px 6px; width:100%; max-height:200px; overflow-y:auto; display:none; }
+    .autocomplete-list .ac-item { padding:8px 12px; font-size:.85rem; cursor:pointer; color:#ddd; border-bottom:1px solid #333; }
+    .autocomplete-list .ac-item:hover { background:rgba(192,57,43,.2); color:#fff; }
+    .autocomplete-wrap { position:relative; }
+
+    /* STATUS BADGE */
+    .status-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:5px; }
+    .status-active { background:#27ae60; }
+    .status-inactive { background:#888; }
+
+    /* FIE STEP LABELS */
+    .fie-step-label { display:flex; align-items:center; gap:10px; font-family:'Oswald',sans-serif; font-size:.9rem; letter-spacing:1px; text-transform:uppercase; color:#ccc; margin-bottom:10px; margin-top:4px; }
+    .fie-step-num { width:24px; height:24px; background:var(--rojo); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700; color:#fff; flex-shrink:0; }
+
+    /* CATEGORY PILLS */
+    .cat-pill { background:#2a2a2a; border:1px solid #444; color:#bbb; border-radius:20px; padding:5px 14px; font-size:.8rem; font-family:'Oswald',sans-serif; letter-spacing:.5px; text-transform:uppercase; cursor:pointer; transition:all .18s; display:inline-flex; align-items:center; gap:6px; }
+    .cat-pill:hover { border-color:#888; color:#fff; background:#333; }
+    .cat-pill.active { background:rgba(192,57,43,.2); border-color:var(--rojo); color:#fff; box-shadow:0 0 0 2px rgba(192,57,43,.25); }
+    .cat-pill.active span { filter:none; }
+
+    /* CATEGORY PANELS */
+    .cat-panel { display:none; border-radius:6px; overflow:hidden; margin-bottom:6px; }
+    .cat-panel.show { display:block; animation:slideDown .2s ease; }
+    @keyframes slideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+    .cat-panel-header { padding:7px 14px; font-family:'Oswald',sans-serif; font-size:.82rem; letter-spacing:.5px; text-transform:uppercase; color:#ddd; }
+    .cat-panel-body { background:#1e1e1e; padding:12px; }
+
+    @media print { .navbar-bomberos,.btn,.no-print { display:none!important; } body { background:#fff; color:#000; } .main-content { background:#fff; } }
+    @media (max-width:576px) { .brand-text h1 { font-size:.95rem; } .nav-tabs-bomberos .nav-link { font-size:.72rem; padding:10px 8px; } }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ NAVBAR ═══════════════ -->
+<nav class="navbar-bomberos">
+  <div class="container-fluid d-flex align-items-center flex-wrap gap-2 py-1">
+    <!-- Logo + Título -->
+    <div class="navbar-brand-wrap">
+      <div class="brand-logo" id="logoWrap">
+        <img src="https://drive.google.com/thumbnail?id=1YfRk7wfbwLLwYq56AlzHoWblWEoyJUBS&sz=w200"
+             alt="IBECH Logo"
+             onerror="this.parentElement.innerHTML='<span class=\'brand-logo-fallback\'>🔥</span>'"/>
+      </div>
+      <div class="brand-text">
+        <h1>Instituto de Bomberos del Estado de Chiapas</h1>
+        <small>Sistema de Gestión Operativa · IBECH 2026</small>
+      </div>
+    </div>
+
+    <!-- Selector Comandancia -->
+    <div class="comandancia-selector ms-auto me-2 no-print">
+      <i class="bi bi-geo-alt-fill" style="color:var(--rojo-claro);"></i>
+      <label for="sel-comandancia">Comandancia:</label>
+      <select id="sel-comandancia" onchange="cambiarComandancia()">
+        <option value="">— Seleccionar —</option>
+        <option value="Tuxtla Gutiérrez">Tuxtla Gutiérrez</option>
+        <option value="San Cristóbal de las Casas">San Cristóbal de las Casas</option>
+        <option value="Tapachula">Tapachula</option>
+        <option value="Comitán">Comitán</option>
+        <option value="Ocosingo">Ocosingo</option>
+        <option value="Venustiano Carranza">Venustiano Carranza</option>
+      </select>
+    </div>
+
+    <!-- Reloj -->
+    <span id="reloj" class="text-secondary pe-2 no-print" style="font-size:.75rem;font-family:'Oswald',sans-serif;"></span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="container-fluid no-print">
+    <ul class="nav nav-tabs-bomberos" id="mainTabs" role="tablist">
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-config" type="button"><i class="bi bi-gear-fill"></i>Datos Generales</button></li>
+      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-fie" type="button"><i class="bi bi-clipboard2-pulse"></i>Servicios (FIE)</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-fic" type="button"><i class="bi bi-mortarboard"></i>Cursos Impartidos</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-prof" type="button"><i class="bi bi-award"></i>Profesionalización</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-stats" type="button"><i class="bi bi-bar-chart-line"></i>Estadísticas</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-ajustes" type="button"><i class="bi bi-sliders"></i>Configuración</button></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══════════════ CONTENT ═══════════════ -->
+<div class="main-content">
+<div class="tab-content p-3 p-md-4" id="mainTabContent">
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║  TAB 0 · DATOS GENERALES         ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<div class="tab-pane fade" id="tab-config" role="tabpanel">
+  <div class="section-header">
+    <h2><i class="bi bi-gear-fill me-2"></i>Datos Generales · Configuración</h2>
+    <p>Registra el personal activo y las unidades/equipos de tu comandancia. Estos datos se usarán en todos los módulos.</p>
+  </div>
+
+  <!-- COMANDANCIA ACTIVA -->
+  <div class="alert mb-4" style="background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.3);color:#ff9999;border-radius:8px;font-size:.88rem;">
+    <i class="bi bi-geo-alt-fill me-2"></i>
+    Comandancia activa: <strong id="lbl-comandancia-activa">No seleccionada — usa el selector en la barra superior</strong>
+  </div>
+
+  <div class="row g-4">
+    <!-- ── PERSONAL ── -->
+    <div class="col-12 col-lg-7">
+      <div class="card-dark">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-people-fill"></i>Personal de la Comandancia</span>
+          <span class="badge badge-info" id="cnt-personal">0 elementos</span>
+        </div>
+        <div class="card-body">
+          <form id="formPersonal" novalidate>
+            <div class="row g-2 mb-2">
+              <div class="col-12 col-md-5">
+                <label class="form-label">Nombre Completo *</label>
+                <input type="text" class="form-control form-control-sm" id="p-nombre" placeholder="Nombre y apellidos" required/>
+              </div>
+              <div class="col-6 col-md-3">
+                <label class="form-label">Cargo / Rango *</label>
+                <select class="form-select form-select-sm" id="p-cargo" required>
+                  <option value="">-- Cargo --</option>
+                  <option>Comandante</option>
+                  <option>Subcomandante</option>
+                  <option>Primer Oficial</option>
+                  <option>Segundo Oficial</option>
+                  <option>Tercer Oficial</option>
+                  <option>Bombero de 1ª</option>
+                  <option>Bombero de 2ª</option>
+                  <option>Bombero de 3ª</option>
+                  <option>Paramédico</option>
+                  <option>Conductor</option>
+                  <option>Administrativo</option>
+                  <option>Otro</option>
+                </select>
+              </div>
+              <div class="col-6 col-md-2">
+                <label class="form-label">Edad</label>
+                <input type="number" class="form-control form-control-sm" id="p-edad" min="18" max="70" placeholder="Ej. 28"/>
+              </div>
+              <div class="col-6 col-md-2">
+                <label class="form-label">Matrícula</label>
+                <input type="text" class="form-control form-control-sm" id="p-matricula" placeholder="Ej. 0042"/>
+              </div>
+              <div class="col-6 col-md-4">
+                <label class="form-label">Teléfono / Número</label>
+                <input type="tel" class="form-control form-control-sm" id="p-telefono" placeholder="Ej. 961 234 5678"/>
+              </div>
+              <div class="col-12 col-md-5">
+                <label class="form-label">Contacto de Emergencia</label>
+                <input type="text" class="form-control form-control-sm" id="p-contacto" placeholder="Nombre y teléfono"/>
+              </div>
+              <div class="col-6 col-md-3">
+                <label class="form-label">Turno / Guardia</label>
+                <select class="form-select form-select-sm" id="p-turno">
+                  <option value="">-- Turno --</option>
+                  <option>Guardia A</option>
+                  <option>Guardia B</option>
+                  <option>Guardia C</option>
+                  <option>Administrativo</option>
+                </select>
+              </div>
+            </div>
+            <div class="d-flex gap-2 mt-2">
+              <button type="submit" class="btn btn-fire btn-sm"><i class="bi bi-person-plus me-1"></i>Agregar Personal</button>
+              <button type="button" class="btn btn-secondary-dark btn-sm" onclick="limpiarPersonal()"><i class="bi bi-x me-1"></i>Limpiar</button>
+            </div>
+            <div id="personal-alert" class="mt-2 d-none alert alert-success-dark py-2"><i class="bi bi-check-circle me-2"></i>Personal registrado correctamente.</div>
+          </form>
+
+          <!-- Buscador personal -->
+          <div class="mt-3 mb-2">
+            <input type="text" class="form-control form-control-sm" id="buscar-personal" placeholder="🔍 Buscar por nombre o cargo..." oninput="renderPersonal()"/>
+          </div>
+
+          <!-- Lista personal -->
+          <div id="lista-personal" class="row g-2 mt-1">
+            <div class="col-12 text-center text-secondary py-3"><i class="bi bi-person-x fs-4 d-block mb-1"></i>Sin personal registrado.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── UNIDADES Y EQUIPOS ── -->
+    <div class="col-12 col-lg-5">
+      <div class="card-dark">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-truck-front-fill"></i>Unidades y Equipos</span>
+          <span class="badge badge-info" id="cnt-unidades">0 unidades</span>
+        </div>
+        <div class="card-body">
+          <form id="formUnidad" novalidate>
+            <div class="row g-2 mb-2">
+              <div class="col-12 col-md-6">
+                <label class="form-label">Nombre / Identificador *</label>
+                <input type="text" class="form-control form-control-sm" id="u-nombre" placeholder="Ej. Unidad 201, Autopipa, Kit SAR" required/>
+              </div>
+              <div class="col-6 col-md-6">
+                <label class="form-label">Tipo</label>
+                <select class="form-select form-select-sm" id="u-tipo">
+                  <option value="">-- Tipo --</option>
+                  <option>Autobomba</option>
+                  <option>Autopipa</option>
+                  <option>Ambulancia</option>
+                  <option>Vehículo de Rescate</option>
+                  <option>Unidad de Materiales Peligrosos</option>
+                  <option>Vehículo Administrativo</option>
+                  <option>Equipo de Rescate</option>
+                  <option>Equipo Médico</option>
+                  <option>Equipo de Protección Personal</option>
+                  <option>Otro</option>
+                </select>
+              </div>
+              <div class="col-6 col-md-4">
+                <label class="form-label">Placas / Serie</label>
+                <input type="text" class="form-control form-control-sm" id="u-placas" placeholder="Ej. CHI-1234"/>
+              </div>
+              <div class="col-6 col-md-4">
+                <label class="form-label">Estado</label>
+                <select class="form-select form-select-sm" id="u-estado">
+                  <option value="Operativo">Operativo</option>
+                  <option value="En mantenimiento">En mantenimiento</option>
+                  <option value="Fuera de servicio">Fuera de servicio</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label">Observaciones</label>
+                <input type="text" class="form-control form-control-sm" id="u-obs" placeholder="Notas..."/>
+              </div>
+            </div>
+            <div class="d-flex gap-2 mt-2">
+              <button type="submit" class="btn btn-fire btn-sm"><i class="bi bi-plus-circle me-1"></i>Agregar</button>
+              <button type="button" class="btn btn-secondary-dark btn-sm" onclick="limpiarUnidad()"><i class="bi bi-x me-1"></i>Limpiar</button>
+            </div>
+            <div id="unidad-alert" class="mt-2 d-none alert alert-success-dark py-2"><i class="bi bi-check-circle me-2"></i>Unidad registrada.</div>
+          </form>
+
+          <!-- Lista unidades -->
+          <div id="lista-unidades" class="row g-2 mt-3">
+            <div class="col-12 text-center text-secondary py-3"><i class="bi bi-truck fs-4 d-block mb-1"></i>Sin unidades registradas.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-config -->
+
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║  TAB 1 · FIE DIARIO              ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<div class="tab-pane fade show active" id="tab-fie" role="tabpanel">
+  <div class="section-header">
+    <h2><i class="bi bi-clipboard2-pulse me-2"></i>Hoja de Registro y Resguardo de Servicios · FIE Diario</h2>
+    <p>Comandancia: <strong id="fie-lbl-com" style="color:#ff9999;">No seleccionada</strong></p>
+  </div>
+
+  <div class="card-dark mb-4" id="card-formFIE">
+    <div class="card-header d-flex justify-content-between align-items-center" style="cursor:pointer;" onclick="toggleFormFIE()">
+      <span><i class="bi bi-plus-circle"></i>Nuevo Registro de Servicio</span>
+      <button type="button" class="btn btn-outline-fire btn-sm py-0 px-2" id="btn-toggle-fie" title="Mostrar/Ocultar formulario">
+        <i class="bi bi-chevron-up" id="icon-toggle-fie"></i>
+      </button>
+    </div>
+    <div id="formFIE-collapse">
+    <div class="card-body">
+      <form id="formFIE" novalidate>
+
+        <!-- ── PASO 1: DATOS GENERALES ── -->
+        <div class="fie-step-label">
+          <span class="fie-step-num">1</span>Datos Generales del Servicio
+        </div>
+        <div class="row g-2 mb-3">
+          <div class="col-6 col-md-1">
+            <label class="form-label">Día</label>
+            <input type="number" class="form-control form-control-sm" id="fie-dia" min="1" max="31" placeholder="01"/>
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="form-label">Mes</label>
+            <select class="form-select form-select-sm" id="fie-mes" required>
+              <option value="">-- Mes --</option>
+              <option>Enero</option><option>Febrero</option><option>Marzo</option><option>Abril</option>
+              <option>Mayo</option><option>Junio</option><option>Julio</option><option>Agosto</option>
+              <option>Septiembre</option><option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="form-label">No. FIE</label>
+            <input type="text" class="form-control form-control-sm" id="fie-num" placeholder="Ej. 001" required/>
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="form-label">Hora</label>
+            <input type="time" class="form-control form-control-sm" id="fie-hora"/>
+          </div>
+          <div class="col-12 col-md-5">
+            <label class="form-label">Dirección / Ubicación</label>
+            <input type="text" class="form-control form-control-sm" id="fie-direccion" placeholder="Calle, colonia, municipio..."/>
+          </div>
+          <div class="col-12 col-md-5">
+            <label class="form-label">Descripción del Servicio</label>
+            <textarea class="form-control form-control-sm" id="fie-descripcion" rows="2" placeholder="Describa brevemente el incidente y acciones realizadas..."></textarea>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label">Personal Asignado <small style="color:#666;text-transform:none;font-weight:normal;">(escribe para buscar)</small></label>
+            <div class="autocomplete-wrap">
+              <input type="text" class="form-control form-control-sm" id="fie-personal-input" placeholder="Buscar elemento..." oninput="autocompletePersonal(this.value,'fie-personal-ac','fie-personal-tags')"/>
+              <div class="autocomplete-list" id="fie-personal-ac"></div>
+            </div>
+            <div id="fie-personal-tags" class="d-flex flex-wrap gap-1 mt-1"></div>
+            <input type="hidden" id="fie-personal-val"/>
+          </div>
+          <div class="col-12 col-md-3">
+            <label class="form-label">Unidades / Equipos <small style="color:#666;text-transform:none;font-weight:normal;">(escribe para buscar)</small></label>
+            <div class="autocomplete-wrap">
+              <input type="text" class="form-control form-control-sm" id="fie-unidades-input" placeholder="Buscar unidad..." oninput="autocompleteUnidad(this.value,'fie-unidades-ac','fie-unidades-tags')"/>
+              <div class="autocomplete-list" id="fie-unidades-ac"></div>
+            </div>
+            <div id="fie-unidades-tags" class="d-flex flex-wrap gap-1 mt-1"></div>
+            <input type="hidden" id="fie-unidades-val"/>
+          </div>
+        </div>
+
+        <!-- ── PASO 2: CATEGORÍAS ── -->
+        <div class="fie-step-label">
+          <span class="fie-step-num">2</span>Tipo de Siniestro / Servicio
+          <small style="font-family:'Source Sans 3',sans-serif;font-size:.75rem;color:#888;text-transform:none;letter-spacing:0;font-weight:normal;margin-left:8px;">Selecciona una o varias categorías que apliquen</small>
+        </div>
+
+        <!-- PILLS selector de categorías -->
+        <div class="d-flex flex-wrap gap-2 mb-3" id="cat-pills">
+          <button type="button" class="cat-pill" data-cat="fuego" onclick="toggleCat('fuego')">
+            <span>🔥</span> Fuego
+          </button>
+          <button type="button" class="cat-pill" data-cat="agua" onclick="toggleCat('agua')">
+            <span>💧</span> Agua y Aire
+          </button>
+          <button type="button" class="cat-pill" data-cat="fauna" onclick="toggleCat('fauna')">
+            <span>🐝</span> Fauna
+          </button>
+          <button type="button" class="cat-pill" data-cat="accidentes" onclick="toggleCat('accidentes')">
+            <span>🚗</span> Accidentes
+          </button>
+          <button type="button" class="cat-pill" data-cat="socio" onclick="toggleCat('socio')">
+            <span>👥</span> Socioorganizativo
+          </button>
+          <button type="button" class="cat-pill" data-cat="byr" onclick="toggleCat('byr')">
+            <span>🔍</span> Búsqueda y Rescate
+          </button>
+        </div>
+
+        <!-- Paneles desplegables por categoría -->
+        <!-- FUEGO -->
+        <div class="cat-panel" id="panel-fuego">
+          <div class="cat-panel-header" style="background:rgba(192,57,43,.15);border-left:3px solid #c0392b;">
+            <span>🔥 Siniestros Relacionados con Fuego</span>
+          </div>
+          <div class="cat-panel-body">
+            <div class="row g-2 row-cols-3 row-cols-sm-5 row-cols-md-9">
+              <div class="col num-group"><label>Casa Habitación</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="casa_hab"/></div>
+              <div class="col num-group"><label>Comercio / Industria</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="comercio"/></div>
+              <div class="col num-group"><label>Pastizales</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="pastizales"/></div>
+              <div class="col num-group"><label>Forestales</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="forestales"/></div>
+              <div class="col num-group"><label>Vehículos</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="vehiculares"/></div>
+              <div class="col num-group"><label>Explosiones</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="explosiones"/></div>
+              <div class="col num-group"><label>Fugas de Gas</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="gas"/></div>
+              <div class="col num-group"><label>Sust. Peligrosas</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="sust_pel"/></div>
+              <div class="col num-group"><label>Mezclas Inflamables</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="mezclas"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AGUA Y AIRE -->
+        <div class="cat-panel" id="panel-agua">
+          <div class="cat-panel-header" style="background:rgba(26,77,122,.2);border-left:3px solid #2980b9;">
+            <span>💧 Siniestros con Agua y Aire</span>
+          </div>
+          <div class="cat-panel-body">
+            <div class="row g-2 row-cols-2 row-cols-md-4">
+              <div class="col num-group"><label>Inundaciones / Encharcamientos</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="inundaciones"/></div>
+              <div class="col num-group"><label>Cables Caídos / Corto Circuito</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="cables"/></div>
+              <div class="col num-group"><label>Espectaculares Caídos</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="espectaculares"/></div>
+              <div class="col num-group"><label>Seccionar Árboles</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="arboles"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAUNA -->
+        <div class="cat-panel" id="panel-fauna">
+          <div class="cat-panel-header" style="background:rgba(74,103,65,.2);border-left:3px solid #5a8c4a;">
+            <span>🐝 Retiro y Captura de Fauna</span>
+          </div>
+          <div class="cat-panel-body">
+            <div class="row g-2 row-cols-2 row-cols-md-4">
+              <div class="col num-group"><label>Retiro de Abejas</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="abejas"/></div>
+              <div class="col num-group"><label>Captura Fauna Nociva</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="fauna_nociva"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACCIDENTES -->
+        <div class="cat-panel" id="panel-accidentes">
+          <div class="cat-panel-header" style="background:rgba(107,66,38,.2);border-left:3px solid #d35400;">
+            <span>🚗 Accidentes</span>
+          </div>
+          <div class="cat-panel-body">
+            <div class="row g-2 row-cols-2 row-cols-md-4">
+              <div class="col num-group"><label>Atención Prehospitalaria</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="prehosp"/></div>
+              <div class="col num-group"><label>Derrame / Fuga Mat. Peligroso</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="derrame"/></div>
+              <div class="col num-group"><label>Extricación Vehicular</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="extricacion"/></div>
+              <div class="col num-group"><label>Derrumbes</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="derrumbes"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOCIOORGANIZATIVO -->
+        <div class="cat-panel" id="panel-socio">
+          <div class="cat-panel-header" style="background:rgba(74,53,117,.2);border-left:3px solid #8e44ad;">
+            <span>👥 Socioorganizativo</span>
+          </div>
+          <div class="cat-panel-body">
+            <div class="row g-2 row-cols-2 row-cols-md-3">
+              <div class="col num-group"><label>Concentración Masiva</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="concentracion"/></div>
+              <div class="col num-group"><label>Servicios de Prevención</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="prevencion"/></div>
+              <div class="col num-group"><label>Proporcionar Agua</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="prop_agua"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BÚSQUEDA Y RESCATE -->
+        <div class="cat-panel" id="panel-byr">
+          <div class="cat-panel-header" style="background:rgba(122,59,0,.2);border-left:3px solid #e67e22;">
+            <span>🔍 Búsqueda y Rescate de Víctimas</span>
+          </div>
+          <div class="cat-panel-body">
+            <div class="row g-2 row-cols-2 row-cols-md-4">
+              <div class="col num-group"><label>Atención Prehospitalaria</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="byr_prehosp"/></div>
+              <div class="col num-group"><label>Búsqueda y Rescate con Vida</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="byr_vida"/></div>
+              <div class="col num-group"><label>Recuperación Cuerpos Sin Vida</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="byr_cuerpos"/></div>
+              <div class="col num-group"><label>Personas Atrapadas</label><input type="number" class="form-control form-control-sm fie-field" min="0" value="0" data-col="byr_atrapadas"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── PASO 3: POBLACIÓN BENEFICIADA ── -->
+        <div class="fie-step-label mt-3">
+          <span class="fie-step-num">3</span>Población Beneficiada
+          <button type="button" class="btn btn-sm ms-auto py-0 px-2" style="background:transparent;border:1px solid #444;color:#888;font-size:.72rem;" onclick="togglePob()">
+            <i class="bi bi-chevron-down" id="icon-pob"></i> Mostrar/Ocultar
+          </button>
+        </div>
+        <div id="panel-pob" style="display:none;">
+          <div style="background:#1e1e1e;border:1px solid #333;border-radius:6px;padding:12px;margin-bottom:12px;">
+            <div class="row g-2 row-cols-3 row-cols-sm-5 row-cols-md-10">
+              <div class="col num-group"><label>Mujeres 16–59</label><input type="number" class="form-control form-control-sm fie-field pob-field" min="0" value="0" data-col="muj_adultas"/></div>
+              <div class="col num-group"><label>Mujeres Ad. Mayores</label><input type="number" class="form-control form-control-sm fie-field pob-field" min="0" value="0" data-col="muj_mayores"/></div>
+              <div class="col num-group"><label>Mujeres c/Disc.</label><input type="number" class="form-control form-control-sm fie-field pob-field" min="0" value="0" data-col="muj_discap"/></div>
+              <div class="col num-group"><label>Hombres 16–59</label><input type="number" class="form-control form-control-sm fie-field pob-field" min="0" value="0" data-col="hom_adultos"/></div>
+              <div class="col num-group"><label>Hombres Ad. Mayores</label><input type="number" class="form-control form-control-sm fie-field pob-field" min="0" value="0" data-col="hom_mayores"/></div>
+              <div class="col num-group"><label>Hombres c/Disc.</label><input type="number" class="form-control form-control-sm fie-field pob-field" min="0" value="0" data-col="hom_discap"/></div>
+              <div class="col num-group"><label>Niñas &lt;16</label><input type="number" class="form-control form-control-sm fie-field pob-field" min="0" value="0" data-col="ninas"/></div>
+              <div class="col num-group"><label>Niños &lt;16</label><input type="number" class="form-control form-control-sm fie-field pob-field" min="0" value="0" data-col="ninos"/></div>
+              <div class="col num-group"><label>LGBT+</label><input type="number" class="form-control form-control-sm fie-field pob-field" min="0" value="0" data-col="lgbt"/></div>
+              <div class="col num-group">
+                <label><strong style="color:#e74c3c;">TOTAL</strong></label>
+                <input type="number" class="form-control form-control-sm" id="fie-total-pob" readonly style="background:#2d0404;font-weight:bold;color:#e74c3c;" value="0"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Observaciones + acciones -->
+        <div class="row g-2 mb-3">
+          <div class="col-12">
+            <label class="form-label">Observaciones / Notas Adicionales</label>
+            <textarea class="form-control form-control-sm" id="fie-obs" rows="2" placeholder="Condiciones especiales, recursos adicionales, seguimiento requerido..."></textarea>
+          </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 no-print">
+          <button type="submit" class="btn btn-fire"><i class="bi bi-save me-2"></i>Guardar Registro</button>
+          <button type="button" class="btn btn-secondary-dark" onclick="limpiarFIE()"><i class="bi bi-arrow-counterclockwise me-2"></i>Limpiar</button>
+          <button type="button" class="btn btn-outline-fire" onclick="window.print()"><i class="bi bi-printer me-2"></i>Imprimir</button>
+        </div>
+        <div id="fie-alert" class="mt-3 d-none alert alert-success-dark"><i class="bi bi-check-circle me-2"></i>Registro guardado correctamente.</div>
+      </form>
+    </div>
+    </div><!-- /formFIE-collapse -->
+  </div>
+
+  <!-- Tabla FIE -->
+  <div class="card-dark">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <span><i class="bi bi-table"></i>Registros Guardados</span>
+      <div class="d-flex gap-2 no-print">
+        <input type="text" class="form-control form-control-sm" id="buscar-fie" placeholder="Buscar..." style="width:160px;" oninput="filtrarTablaFIE()"/>
+        <button class="btn btn-outline-fire btn-sm" onclick="exportarCSV()"><i class="bi bi-download me-1"></i>CSV</button>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-dark-custom table-hover mb-0">
+          <thead><tr>
+            <th>#</th><th>Día</th><th>Mes</th><th>No.FIE</th><th>Hora</th>
+            <th>Comandancia</th><th>Dirección</th><th>Personal</th><th>Unidades</th>
+            <th>T.Serv.</th><th>Pob.</th><th>Acc.</th>
+          </tr></thead>
+          <tbody id="tbody-fie"><tr><td colspan="12" class="text-center text-secondary py-4"><i class="bi bi-inbox fs-3 d-block mb-2"></i>Sin registros aún.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-fie -->
+
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║  TAB 2 · FIC                     ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<div class="tab-pane fade" id="tab-fic" role="tabpanel">
+  <div class="section-header">
+    <h2><i class="bi bi-mortarboard me-2"></i>Cursos, Talleres y/o Capacitaciones Impartidas · FIC</h2>
+    <p>Comandancia: <strong id="fic-lbl-com" style="color:#ff9999;">No seleccionada</strong></p>
+  </div>
+
+  <div class="card-dark mb-4">
+    <div class="card-header"><i class="bi bi-plus-circle"></i>Nuevo Registro FIC</div>
+    <div class="card-body">
+      <form id="formFIC" novalidate>
+        <div class="row g-3 mb-3">
+          <div class="col-6 col-md-1"><label class="form-label">Día</label><input type="number" class="form-control form-control-sm" id="fic-dia" min="1" max="31" placeholder="01"/></div>
+          <div class="col-6 col-md-2">
+            <label class="form-label">Mes</label>
+            <select class="form-select form-select-sm" id="fic-mes" required>
+              <option value="">-- Mes --</option>
+              <option>Enero</option><option>Febrero</option><option>Marzo</option><option>Abril</option>
+              <option>Mayo</option><option>Junio</option><option>Julio</option><option>Agosto</option>
+              <option>Septiembre</option><option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-1"><label class="form-label">No. FIC</label><input type="text" class="form-control form-control-sm" id="fic-num" required/></div>
+          <div class="col-6 col-md-2"><label class="form-label">Duración (hrs.)</label><input type="number" step="0.5" class="form-control form-control-sm" id="fic-horas" min="0" placeholder="0"/></div>
+          <div class="col-12 col-md-3"><label class="form-label">Organismo o Centro</label><input type="text" class="form-control form-control-sm" id="fic-organismo" placeholder="Nombre de la institución..." required/></div>
+          <div class="col-12 col-md-3"><label class="form-label">Tema del Curso / Taller</label><input type="text" class="form-control form-control-sm" id="fic-tema" placeholder="Ej. Primeros auxilios básicos..." required/></div>
+        </div>
+        <!-- Instructor autocomplete -->
+        <div class="row g-3 mb-3">
+          <div class="col-12 col-md-4">
+            <label class="form-label">Instructor / Ponente <small style="color:#777;text-transform:none;font-weight:normal;">(buscar en personal)</small></label>
+            <div class="autocomplete-wrap">
+              <input type="text" class="form-control form-control-sm" id="fic-instructor-input" placeholder="Buscar elemento registrado..." oninput="autocompletePersonal(this.value,'fic-instructor-ac','fic-instructor-tags')"/>
+              <div class="autocomplete-list" id="fic-instructor-ac"></div>
+            </div>
+            <div id="fic-instructor-tags" class="d-flex flex-wrap gap-1 mt-1"></div>
+            <input type="hidden" id="fic-instructor-val"/>
+          </div>
+        </div>
+        <hr class="divider-fire"/>
+        <div class="mb-3">
+          <span class="cat-badge" style="background:#555;"><i class="bi bi-people me-1"></i>Beneficiarios</span>
+          <div class="row g-2 row-cols-3 row-cols-md-7">
+            <div class="col num-group"><label>Mujeres</label><input type="number" class="form-control form-control-sm fic-field" min="0" value="0" data-col="mujeres"/></div>
+            <div class="col num-group"><label>Hombres</label><input type="number" class="form-control form-control-sm fic-field" min="0" value="0" data-col="hombres"/></div>
+            <div class="col num-group"><label>Niñas</label><input type="number" class="form-control form-control-sm fic-field" min="0" value="0" data-col="ninas"/></div>
+            <div class="col num-group"><label>Niños</label><input type="number" class="form-control form-control-sm fic-field" min="0" value="0" data-col="ninos"/></div>
+            <div class="col num-group"><label>P. c/Discapacidad</label><input type="number" class="form-control form-control-sm fic-field" min="0" value="0" data-col="discap"/></div>
+            <div class="col num-group"><label>LGBT+</label><input type="number" class="form-control form-control-sm fic-field" min="0" value="0" data-col="lgbt"/></div>
+            <div class="col num-group"><label><strong style="color:#2ecc71;">TOTAL</strong></label><input type="number" class="form-control form-control-sm" id="fic-total" readonly style="background:#1a3d00;font-weight:bold;color:#2ecc71;" value="0"/></div>
+          </div>
+        </div>
+        <div class="d-flex flex-wrap gap-2 no-print">
+          <button type="submit" class="btn btn-fire"><i class="bi bi-save me-2"></i>Guardar</button>
+          <button type="button" class="btn btn-secondary-dark" onclick="limpiarFIC()"><i class="bi bi-arrow-counterclockwise me-2"></i>Limpiar</button>
+        </div>
+        <div id="fic-alert" class="mt-3 d-none alert alert-success-dark"><i class="bi bi-check-circle me-2"></i>Registro FIC guardado.</div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card-dark">
+    <div class="card-header"><i class="bi bi-table"></i>Registros FIC Guardados</div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-dark-custom mb-0">
+          <thead><tr><th>#</th><th>Día</th><th>Mes</th><th>No.FIC</th><th>Hrs.</th><th>Organismo</th><th>Tema</th><th>Instructor</th><th>Muj.</th><th>Hom.</th><th>Niñas</th><th>Niños</th><th>Disc.</th><th>LGBT+</th><th>Total</th><th>Acc.</th></tr></thead>
+          <tbody id="tbody-fic"><tr><td colspan="16" class="text-center text-secondary py-4"><i class="bi bi-inbox fs-3 d-block mb-2"></i>Sin registros.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-fic -->
+
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║  TAB 3 · PROFESIONALIZACIÓN      ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<div class="tab-pane fade" id="tab-prof" role="tabpanel">
+  <div class="section-header">
+    <h2><i class="bi bi-award me-2"></i>Cursos, Certificaciones y/o Talleres Recibidos</h2>
+    <p>Profesionalización del personal bomberil · Comandancia: <strong id="prof-lbl-com" style="color:#ff9999;">No seleccionada</strong></p>
+  </div>
+
+  <div class="card-dark mb-4">
+    <div class="card-header"><i class="bi bi-plus-circle"></i>Nuevo Registro de Capacitación Recibida</div>
+    <div class="card-body">
+      <form id="formProf" novalidate>
+        <div class="row g-3 mb-3">
+          <div class="col-6 col-md-1"><label class="form-label">Día</label><input type="number" class="form-control form-control-sm" id="prof-dia" min="1" max="31" placeholder="01"/></div>
+          <div class="col-6 col-md-2">
+            <label class="form-label">Mes</label>
+            <select class="form-select form-select-sm" id="prof-mes" required>
+              <option value="">-- Mes --</option>
+              <option>Enero</option><option>Febrero</option><option>Marzo</option><option>Abril</option>
+              <option>Mayo</option><option>Junio</option><option>Julio</option><option>Agosto</option>
+              <option>Septiembre</option><option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-2"><label class="form-label">Duración (hrs.)</label><input type="number" step="0.5" class="form-control form-control-sm" id="prof-horas" min="0" placeholder="0"/></div>
+          <div class="col-12 col-md-3"><label class="form-label">Instructor</label><input type="text" class="form-control form-control-sm" id="prof-instructor" placeholder="Nombre del instructor..."/></div>
+          <div class="col-12 col-md-2"><label class="form-label">Procedencia</label><input type="text" class="form-control form-control-sm" id="prof-procedencia" placeholder="Institución..."/></div>
+          <div class="col-12 col-md-2"><label class="form-label">Instalaciones</label><input type="text" class="form-control form-control-sm" id="prof-instalaciones" placeholder="Lugar..."/></div>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-12 col-md-5">
+            <label class="form-label">Tema / Curso / Certificación</label>
+            <input type="text" class="form-control form-control-sm" id="prof-tema" placeholder="Ej. Rescate en estructuras, NFPA 1..." required/>
+          </div>
+          <!-- Personal autocomplete -->
+          <div class="col-12 col-md-4">
+            <label class="form-label">Participantes <small style="color:#777;text-transform:none;font-weight:normal;">(buscar en personal)</small></label>
+            <div class="autocomplete-wrap">
+              <input type="text" class="form-control form-control-sm" id="prof-personal-input" placeholder="Buscar elemento..." oninput="autocompletePersonal(this.value,'prof-personal-ac','prof-personal-tags')"/>
+              <div class="autocomplete-list" id="prof-personal-ac"></div>
+            </div>
+            <div id="prof-personal-tags" class="d-flex flex-wrap gap-1 mt-1"></div>
+            <input type="hidden" id="prof-personal-val"/>
+          </div>
+          <div class="col-6 col-md-1"><label class="form-label">Mujeres</label><input type="number" class="form-control form-control-sm" id="prof-mujeres" min="0" value="0"/></div>
+          <div class="col-6 col-md-1"><label class="form-label">Hombres</label><input type="number" class="form-control form-control-sm" id="prof-hombres" min="0" value="0"/></div>
+          <div class="col-6 col-md-1"><label class="form-label" style="color:#2ecc71;"><strong>Total</strong></label><input type="number" class="form-control form-control-sm" id="prof-total" readonly style="background:#1a3d00;font-weight:bold;color:#2ecc71;" value="0"/></div>
+        </div>
+        <div class="d-flex flex-wrap gap-2 no-print">
+          <button type="submit" class="btn btn-fire"><i class="bi bi-save me-2"></i>Guardar</button>
+          <button type="button" class="btn btn-secondary-dark" onclick="limpiarProf()"><i class="bi bi-arrow-counterclockwise me-2"></i>Limpiar</button>
+        </div>
+        <div id="prof-alert" class="mt-3 d-none alert alert-success-dark"><i class="bi bi-check-circle me-2"></i>Registro guardado.</div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card-dark">
+    <div class="card-header"><i class="bi bi-table"></i>Registros de Profesionalización</div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-dark-custom mb-0">
+          <thead><tr><th>#</th><th>Día</th><th>Mes</th><th>Hrs.</th><th>Instructor</th><th>Procedencia</th><th>Instalaciones</th><th>Tema</th><th>Participantes</th><th>Muj.</th><th>Hom.</th><th>Total</th><th>Acc.</th></tr></thead>
+          <tbody id="tbody-prof"><tr><td colspan="13" class="text-center text-secondary py-4"><i class="bi bi-inbox fs-3 d-block mb-2"></i>Sin registros.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-prof -->
+
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║  TAB 4 · ESTADÍSTICAS            ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<div class="tab-pane fade" id="tab-stats" role="tabpanel">
+  <div class="section-header">
+    <h2><i class="bi bi-bar-chart-line me-2"></i>Estadísticas y Reportes Generales</h2>
+    <p>Resumen de servicios, capacitaciones y población beneficiada · 2026</p>
+  </div>
+
+  <!-- Botones de exportación / envío -->
+  <div class="card-dark mb-4">
+    <div class="card-header"><i class="bi bi-share"></i>Exportar y Compartir Reporte</div>
+    <div class="card-body">
+      <p style="font-size:.83rem;color:#aaa;margin-bottom:12px;">Selecciona el período del reporte y elige cómo enviarlo o descargarlo:</p>
+      <div class="row g-2 mb-3 align-items-end">
+        <div class="col-6 col-md-3">
+          <label class="form-label">Mes</label>
+          <select class="form-select form-select-sm" id="rep-mes">
+            <option value="">Todos los meses</option>
+            <option>Enero</option><option>Febrero</option><option>Marzo</option><option>Abril</option>
+            <option>Mayo</option><option>Junio</option><option>Julio</option><option>Agosto</option>
+            <option>Septiembre</option><option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-3">
+          <label class="form-label">Tipo de dato</label>
+          <select class="form-select form-select-sm" id="rep-tipo">
+            <option value="fie">Servicios (FIE)</option>
+            <option value="fic">Cursos Impartidos (FIC)</option>
+            <option value="prof">Profesionalización</option>
+            <option value="todo">Todo</option>
+          </select>
+        </div>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <!-- WhatsApp -->
+        <button class="btn btn-sm d-flex align-items-center gap-2" style="background:#25D366;color:#fff;font-family:'Oswald',sans-serif;letter-spacing:1px;text-transform:uppercase;border:none;padding:8px 18px;border-radius:5px;" onclick="compartirWhatsApp()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
+          WhatsApp
+        </button>
+        <!-- PDF -->
+        <button class="btn btn-sm d-flex align-items-center gap-2" style="background:#e74c3c;color:#fff;font-family:'Oswald',sans-serif;letter-spacing:1px;text-transform:uppercase;border:none;padding:8px 18px;border-radius:5px;" onclick="descargarPDF()">
+          <i class="bi bi-file-earmark-pdf-fill"></i> Descargar PDF
+        </button>
+        <!-- CSV -->
+        <button class="btn btn-sm d-flex align-items-center gap-2" style="background:#27ae60;color:#fff;font-family:'Oswald',sans-serif;letter-spacing:1px;text-transform:uppercase;border:none;padding:8px 18px;border-radius:5px;" onclick="descargarCSVReporte()">
+          <i class="bi bi-file-earmark-spreadsheet-fill"></i> Descargar CSV
+        </button>
+        <!-- Imprimir -->
+        <button class="btn btn-outline-fire btn-sm d-flex align-items-center gap-2" onclick="window.print()">
+          <i class="bi bi-printer"></i> Imprimir
+        </button>
+      </div>
+      <div id="rep-alert" class="mt-3 d-none alert alert-success-dark py-2"><i class="bi bi-check-circle me-2"></i><span id="rep-alert-msg"></span></div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3"><div class="stat-card"><i class="bi bi-clipboard2-pulse"></i><div class="stat-number" id="stat-total-fie">0</div><div class="stat-label">Servicios FIE</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><i class="bi bi-fire"></i><div class="stat-number" id="stat-incendios">0</div><div class="stat-label">Incendios</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><i class="bi bi-people"></i><div class="stat-number" id="stat-pob">0</div><div class="stat-label">Personas Beneficiadas</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><i class="bi bi-mortarboard"></i><div class="stat-number" id="stat-cursos">0</div><div class="stat-label">Cursos Registrados</div></div></div>
+  </div>
+
+  <div class="card-dark mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-calendar3"></i>Resumen Mensual · Servicios FIE</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-dark-custom mb-0">
+          <thead><tr><th>Mes</th><th>Fuego</th><th>Agua/Aire</th><th>Fauna</th><th>Accidentes</th><th>Socioorg.</th><th>B.Rescate</th><th>Pob.Ben.</th><th>Total</th></tr></thead>
+          <tbody id="tbody-resumen"><tr><td colspan="9" class="text-center text-secondary py-4"><i class="bi bi-bar-chart fs-3 d-block mb-2"></i>Captura servicios para ver estadísticas.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-dark">
+    <div class="card-header"><i class="bi bi-pie-chart"></i>Distribución por Categoría</div>
+    <div class="card-body">
+      <div id="chart-bars"></div>
+      <p class="text-secondary text-center mt-2 mb-0" style="font-size:.8rem;" id="chart-empty">Agrega registros FIE para visualizar.</p>
+    </div>
+  </div>
+</div><!-- /tab-stats -->
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║  TAB 5 · CONFIGURACIÓN           ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<div class="tab-pane fade" id="tab-ajustes" role="tabpanel">
+  <div class="section-header">
+    <h2><i class="bi bi-sliders me-2"></i>Configuración del Sistema</h2>
+    <p>Respaldo, restauración y gestión de datos del sistema IBECH</p>
+  </div>
+
+  <div class="row g-4">
+    <!-- JSON -->
+    <div class="col-12 col-md-6">
+      <div class="card-dark h-100">
+        <div class="card-header"><i class="bi bi-filetype-json"></i>Respaldo JSON · Datos Completos</div>
+        <div class="card-body">
+          <p style="font-size:.83rem;color:#aaa;margin-bottom:16px;">Exporta o importa <strong style="color:#fff;">todos los datos</strong> del sistema (personal, unidades, servicios FIE, cursos FIC y profesionalización) en formato JSON. Ideal para respaldos y migraciones entre dispositivos.</p>
+
+          <div class="d-flex flex-column gap-3">
+            <!-- Descargar JSON -->
+            <div style="background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:14px;">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-cloud-download" style="color:#f39c12;font-size:1.3rem;"></i>
+                <strong style="font-family:'Oswald',sans-serif;letter-spacing:1px;font-size:.9rem;">Descargar JSON</strong>
+              </div>
+              <p style="font-size:.78rem;color:#888;margin-bottom:10px;">Guarda un archivo con todos tus datos actuales como respaldo.</p>
+              <button class="btn btn-fire btn-sm" onclick="descargarJSON()"><i class="bi bi-download me-2"></i>Descargar Archivo JSON</button>
+            </div>
+
+            <!-- Cargar JSON -->
+            <div style="background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:14px;">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-cloud-upload" style="color:#2980b9;font-size:1.3rem;"></i>
+                <strong style="font-family:'Oswald',sans-serif;letter-spacing:1px;font-size:.9rem;">Cargar JSON</strong>
+              </div>
+              <p style="font-size:.78rem;color:#888;margin-bottom:10px;">⚠️ Restaurar desde un JSON <strong style="color:#e74c3c;">reemplazará</strong> todos los datos actuales.</p>
+              <div class="d-flex gap-2 align-items-center">
+                <input type="file" class="form-control form-control-sm" id="input-json" accept=".json" style="flex:1;"/>
+                <button class="btn btn-outline-fire btn-sm" onclick="cargarJSON()"><i class="bi bi-upload me-1"></i>Cargar</button>
+              </div>
+              <div id="json-alert" class="mt-2 d-none alert alert-success-dark py-2 mb-0"><i class="bi bi-check-circle me-2"></i><span id="json-alert-msg"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CSV -->
+    <div class="col-12 col-md-6">
+      <div class="card-dark h-100">
+        <div class="card-header"><i class="bi bi-filetype-csv"></i>Plantilla CSV · Importación Masiva</div>
+        <div class="card-body">
+          <p style="font-size:.83rem;color:#aaa;margin-bottom:16px;">Descarga una plantilla CSV para capturar datos en Excel y luego importarlos al sistema de forma masiva. Útil para cargar registros históricos.</p>
+
+          <div class="d-flex flex-column gap-3">
+            <!-- Descargar plantilla -->
+            <div style="background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:14px;">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-file-earmark-arrow-down" style="color:#27ae60;font-size:1.3rem;"></i>
+                <strong style="font-family:'Oswald',sans-serif;letter-spacing:1px;font-size:.9rem;">Descargar Plantilla CSV</strong>
+              </div>
+              <p style="font-size:.78rem;color:#888;margin-bottom:10px;">Selecciona el tipo de plantilla a descargar:</p>
+              <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-sm" style="background:#27ae60;color:#fff;font-family:'Oswald',sans-serif;letter-spacing:1px;text-transform:uppercase;border:none;" onclick="descargarPlantillaCSV('fie')"><i class="bi bi-fire me-1"></i>Plantilla FIE</button>
+                <button class="btn btn-sm" style="background:#2980b9;color:#fff;font-family:'Oswald',sans-serif;letter-spacing:1px;text-transform:uppercase;border:none;" onclick="descargarPlantillaCSV('fic')"><i class="bi bi-mortarboard me-1"></i>Plantilla FIC</button>
+                <button class="btn btn-sm" style="background:#8e44ad;color:#fff;font-family:'Oswald',sans-serif;letter-spacing:1px;text-transform:uppercase;border:none;" onclick="descargarPlantillaCSV('prof')"><i class="bi bi-award me-1"></i>Plantilla Prof.</button>
+                <button class="btn btn-sm" style="background:#555;color:#fff;font-family:'Oswald',sans-serif;letter-spacing:1px;text-transform:uppercase;border:none;" onclick="descargarPlantillaCSV('personal')"><i class="bi bi-people me-1"></i>Plantilla Personal</button>
+              </div>
+            </div>
+
+            <!-- Cargar CSV -->
+            <div style="background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:14px;">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-file-earmark-arrow-up" style="color:#e67e22;font-size:1.3rem;"></i>
+                <strong style="font-family:'Oswald',sans-serif;letter-spacing:1px;font-size:.9rem;">Cargar CSV</strong>
+              </div>
+              <p style="font-size:.78rem;color:#888;margin-bottom:10px;">El CSV debe tener el formato exacto de la plantilla. Los datos se <strong style="color:#2ecc71;">agregarán</strong> a los existentes.</p>
+              <div class="row g-2">
+                <div class="col-12 col-sm-4">
+                  <select class="form-select form-select-sm" id="csv-tipo">
+                    <option value="fie">FIE (Servicios)</option>
+                    <option value="fic">FIC (Cursos)</option>
+                    <option value="prof">Profesionalización</option>
+                    <option value="personal">Personal</option>
+                  </select>
+                </div>
+                <div class="col-12 col-sm-5">
+                  <input type="file" class="form-control form-control-sm" id="input-csv" accept=".csv"/>
+                </div>
+                <div class="col-12 col-sm-3">
+                  <button class="btn btn-outline-fire btn-sm w-100" onclick="cargarCSV()"><i class="bi bi-upload me-1"></i>Cargar</button>
+                </div>
+              </div>
+              <div id="csv-alert" class="mt-2 d-none alert alert-success-dark py-2 mb-0"><i class="bi bi-check-circle me-2"></i><span id="csv-alert-msg"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info del sistema -->
+    <div class="col-12">
+      <div class="card-dark">
+        <div class="card-header"><i class="bi bi-info-circle"></i>Información del Sistema</div>
+        <div class="card-body">
+          <div class="row g-3" id="sys-info">
+            <div class="col-6 col-md-3"><div class="stat-card" style="border-top-color:#2980b9;"><i class="bi bi-people" style="color:#2980b9;"></i><div class="stat-number" style="color:#2980b9;" id="sys-personal">0</div><div class="stat-label">Personal Registrado</div></div></div>
+            <div class="col-6 col-md-3"><div class="stat-card" style="border-top-color:#27ae60;"><i class="bi bi-truck" style="color:#27ae60;"></i><div class="stat-number" style="color:#27ae60;" id="sys-unidades">0</div><div class="stat-label">Unidades / Equipos</div></div></div>
+            <div class="col-6 col-md-3"><div class="stat-card"><i class="bi bi-clipboard2-pulse"></i><div class="stat-number" id="sys-fie">0</div><div class="stat-label">Registros FIE</div></div></div>
+            <div class="col-6 col-md-3"><div class="stat-card" style="border-top-color:#8e44ad;"><i class="bi bi-mortarboard" style="color:#8e44ad;"></i><div class="stat-number" style="color:#8e44ad;" id="sys-cursos">0</div><div class="stat-label">Cursos (FIC + Prof.)</div></div></div>
+          </div>
+          <hr class="divider-fire"/>
+          <div class="d-flex flex-wrap gap-2 align-items-center">
+            <span style="font-size:.8rem;color:#666;">Zona de peligro:</span>
+            <button class="btn btn-sm" style="background:transparent;border:1px solid #c0392b;color:#e74c3c;font-family:'Oswald',sans-serif;letter-spacing:1px;text-transform:uppercase;font-size:.75rem;" onclick="borrarTodosLosDatos()">
+              <i class="bi bi-trash3 me-1"></i>Borrar Todos los Datos
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-ajustes -->
+
+</div><!-- /tab-content -->
+</div><!-- /main-content -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ═══════════════════════════════════
+//  DATA STORE
+// ═══════════════════════════════════
+const DB = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)||'[]'); } catch(e){ return []; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v)),
+  getStr: k => localStorage.getItem(k)||'',
+  setStr: (k,v) => localStorage.setItem(k,v)
+};
+
+// ═══════════════════════════════════
+//  RELOJ
+// ═══════════════════════════════════
+function updateClock() {
+  const n = new Date();
+  const el = document.getElementById('reloj');
+  if(el) el.textContent = n.toLocaleDateString('es-MX',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})+' · '+n.toLocaleTimeString('es-MX');
+}
+setInterval(updateClock,1000); updateClock();
+
+// ═══════════════════════════════════
+//  COMANDANCIA
+// ═══════════════════════════════════
+function cambiarComandancia() {
+  const v = document.getElementById('sel-comandancia').value;
+  DB.setStr('comandancia', v);
+  actualizarLabelsComandancia();
+}
+
+function actualizarLabelsComandancia() {
+  const v = DB.getStr('comandancia') || 'No seleccionada';
+  ['fie-lbl-com','fic-lbl-com','prof-lbl-com','lbl-comandancia-activa'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.textContent = v;
+  });
+  const sel = document.getElementById('sel-comandancia');
+  if(sel && DB.getStr('comandancia')) sel.value = DB.getStr('comandancia');
+}
+
+// ═══════════════════════════════════
+//  PERSONAL
+// ═══════════════════════════════════
+document.getElementById('formPersonal').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const nombre = document.getElementById('p-nombre').value.trim();
+  const cargo = document.getElementById('p-cargo').value;
+  if(!nombre || !cargo) { alert('Ingresa nombre y cargo.'); return; }
+  const rec = {
+    id: Date.now(),
+    nombre,
+    cargo,
+    edad: document.getElementById('p-edad').value,
+    matricula: document.getElementById('p-matricula').value,
+    telefono: document.getElementById('p-telefono').value,
+    contacto: document.getElementById('p-contacto').value,
+    turno: document.getElementById('p-turno').value,
+    activo: true
+  };
+  const arr = DB.get('personal'); arr.push(rec); DB.set('personal', arr);
+  renderPersonal(); showAlert('personal-alert'); limpiarPersonal();
+});
+
+function limpiarPersonal() { document.getElementById('formPersonal').reset(); }
+
+function renderPersonal() {
+  const q = (document.getElementById('buscar-personal')?.value||'').toLowerCase();
+  const arr = DB.get('personal').filter(p =>
+    p.nombre.toLowerCase().includes(q) || (p.cargo||'').toLowerCase().includes(q)
+  );
+  const cnt = DB.get('personal').length;
+  document.getElementById('cnt-personal').textContent = cnt + ' elemento' + (cnt!==1?'s':'');
+  const wrap = document.getElementById('lista-personal');
+  if(!arr.length) {
+    wrap.innerHTML = '<div class="col-12 text-center text-secondary py-3"><i class="bi bi-person-x fs-4 d-block mb-1"></i>Sin personal registrado.</div>';
+    return;
+  }
+  wrap.innerHTML = arr.map(p => `
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="personal-card">
+        <button class="delete-btn" onclick="eliminarPersonal(${p.id})" title="Eliminar"><i class="bi bi-x"></i></button>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <div style="width:34px;height:34px;background:#3d0606;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">👤</div>
+          <div>
+            <div class="nombre">${p.nombre}</div>
+            <span class="cargo-badge">${p.cargo}</span>
+          </div>
+        </div>
+        <div class="detail"><i class="bi bi-hash me-1"></i>Matrícula: ${p.matricula||'—'} &nbsp;·&nbsp; <i class="bi bi-person-fill me-1"></i>${p.edad||'—'} años</div>
+        ${p.turno?`<div class="detail"><i class="bi bi-clock me-1"></i>${p.turno}</div>`:''}
+        ${p.telefono?`<div class="detail"><i class="bi bi-telephone me-1"></i>${p.telefono}</div>`:''}
+        ${p.contacto?`<div class="detail"><i class="bi bi-heart me-1" style="color:#e74c3c;"></i>Emerg: ${p.contacto}</div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function eliminarPersonal(id) {
+  if(!confirm('¿Eliminar este elemento del personal?')) return;
+  DB.set('personal', DB.get('personal').filter(p=>p.id!==id));
+  renderPersonal();
+}
+
+// ═══════════════════════════════════
+//  UNIDADES
+// ═══════════════════════════════════
+document.getElementById('formUnidad').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const nombre = document.getElementById('u-nombre').value.trim();
+  if(!nombre) { alert('Ingresa el nombre de la unidad.'); return; }
+  const rec = {
+    id: Date.now(),
+    nombre,
+    tipo: document.getElementById('u-tipo').value,
+    placas: document.getElementById('u-placas').value,
+    estado: document.getElementById('u-estado').value,
+    obs: document.getElementById('u-obs').value
+  };
+  const arr = DB.get('unidades'); arr.push(rec); DB.set('unidades', arr);
+  renderUnidades(); showAlert('unidad-alert'); limpiarUnidad();
+});
+
+function limpiarUnidad() { document.getElementById('formUnidad').reset(); document.getElementById('u-estado').value='Operativo'; }
+
+function renderUnidades() {
+  const arr = DB.get('unidades');
+  const cnt = arr.length;
+  document.getElementById('cnt-unidades').textContent = cnt + ' unidad' + (cnt!==1?'es':'');
+  const wrap = document.getElementById('lista-unidades');
+  if(!arr.length) {
+    wrap.innerHTML = '<div class="col-12 text-center text-secondary py-3"><i class="bi bi-truck fs-4 d-block mb-1"></i>Sin unidades registradas.</div>';
+    return;
+  }
+  const estadoColor = { 'Operativo':'#27ae60','En mantenimiento':'#f39c12','Fuera de servicio':'#c0392b' };
+  wrap.innerHTML = arr.map(u => `
+    <div class="col-12 col-md-6">
+      <div class="unidad-card">
+        <button class="delete-btn" onclick="eliminarUnidad(${u.id})" title="Eliminar"><i class="bi bi-x"></i></button>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span style="font-size:20px;">${u.tipo?.includes('Ambulancia')?'🚑':u.tipo?.includes('Autopipa')?'🚒':'🚒'}</span>
+          <div class="unidad-nombre">${u.nombre}</div>
+        </div>
+        ${u.tipo?`<div class="detail"><i class="bi bi-tag me-1"></i>${u.tipo}</div>`:''}
+        ${u.placas?`<div class="detail"><i class="bi bi-card-text me-1"></i>Placas: ${u.placas}</div>`:''}
+        <div class="detail"><span class="status-dot" style="background:${estadoColor[u.estado]||'#888'};"></span>${u.estado}</div>
+        ${u.obs?`<div class="detail" style="color:#777;">${u.obs}</div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function eliminarUnidad(id) {
+  if(!confirm('¿Eliminar esta unidad?')) return;
+  DB.set('unidades', DB.get('unidades').filter(u=>u.id!==id));
+  renderUnidades();
+}
+
+// ═══════════════════════════════════
+//  AUTOCOMPLETE HELPERS
+// ═══════════════════════════════════
+const selectedTags = {};
+
+function autocompletePersonal(query, acId, tagsId) {
+  const ac = document.getElementById(acId);
+  if(!query.trim()) { ac.style.display='none'; return; }
+  const q = query.toLowerCase();
+  const matches = DB.get('personal').filter(p =>
+    p.nombre.toLowerCase().includes(q) || (p.cargo||'').toLowerCase().includes(q)
+  ).slice(0,8);
+  if(!matches.length) { ac.style.display='none'; return; }
+  ac.innerHTML = matches.map(p =>
+    `<div class="ac-item" onclick="selectTag('${p.nombre}','${p.cargo||''}','${acId}','${tagsId}')">${p.nombre} <small style="color:#888;">— ${p.cargo}</small></div>`
+  ).join('');
+  ac.style.display='block';
+}
+
+function autocompleteUnidad(query, acId, tagsId) {
+  const ac = document.getElementById(acId);
+  if(!query.trim()) { ac.style.display='none'; return; }
+  const q = query.toLowerCase();
+  const matches = DB.get('unidades').filter(u =>
+    u.nombre.toLowerCase().includes(q) || (u.tipo||'').toLowerCase().includes(q)
+  ).slice(0,8);
+  if(!matches.length) { ac.style.display='none'; return; }
+  ac.innerHTML = matches.map(u =>
+    `<div class="ac-item" onclick="selectTag('${u.nombre}','${u.tipo||''}','${acId}','${tagsId}')">${u.nombre} <small style="color:#888;">— ${u.tipo||''}</small></div>`
+  ).join('');
+  ac.style.display='block';
+}
+
+function selectTag(nombre, subtexto, acId, tagsId) {
+  const ac = document.getElementById(acId);
+  const wrap = document.getElementById(tagsId);
+  ac.style.display='none';
+  // clear input
+  const inputId = acId.replace('-ac','');
+  const inp = document.getElementById(inputId+'-input');
+  if(inp) inp.value='';
+
+  if(!selectedTags[tagsId]) selectedTags[tagsId]=[];
+  if(selectedTags[tagsId].includes(nombre)) return;
+  selectedTags[tagsId].push(nombre);
+  renderTags(tagsId);
+  // update hidden
+  const hiddenId = acId.replace('-ac','').replace('-input','') + '-val';
+  const hidden = document.getElementById(hiddenId.replace(acId.split('-').slice(0,-1).join('-')+'-','').trim());
+}
+
+function renderTags(tagsId) {
+  const wrap = document.getElementById(tagsId);
+  if(!wrap) return;
+  const tags = selectedTags[tagsId]||[];
+  wrap.innerHTML = tags.map((t,i) =>
+    `<span style="background:#3d0606;color:#ffaaaa;font-size:.72rem;padding:2px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px;">
+      ${t} <span onclick="removeTag('${tagsId}',${i})" style="cursor:pointer;color:#ff6666;">×</span>
+    </span>`
+  ).join('');
+}
+
+function removeTag(tagsId, idx) {
+  if(selectedTags[tagsId]) { selectedTags[tagsId].splice(idx,1); renderTags(tagsId); }
+}
+
+function getTagsValue(tagsId) {
+  return (selectedTags[tagsId]||[]).join(', ');
+}
+
+function clearTags(tagsId) {
+  selectedTags[tagsId]=[];
+  renderTags(tagsId);
+  const wrap = document.getElementById(tagsId);
+  if(wrap) wrap.innerHTML='';
+}
+
+// Cerrar autocomplete al hacer click fuera
+document.addEventListener('click', e => {
+  document.querySelectorAll('.autocomplete-list').forEach(ac => {
+    if(!ac.parentElement.contains(e.target)) ac.style.display='none';
+  });
+});
+
+// ═══════════════════════════════════
+//  FIE
+// ═══════════════════════════════════
+document.querySelectorAll('.pob-field').forEach(el => {
+  el.addEventListener('input', recalcPob);
+});
+
+function calcTotalServ(f) {
+  return ['casa_hab','comercio','pastizales','forestales','vehiculares','explosiones','gas','sust_pel','mezclas',
+    'inundaciones','cables','espectaculares','arboles','abejas','fauna_nociva',
+    'prehosp','derrame','extricacion','derrumbes',
+    'concentracion','prevencion','prop_agua',
+    'byr_prehosp','byr_vida','byr_cuerpos','byr_atrapadas'].reduce((s,c)=>s+(f[c]||0),0);
+}
+
+document.getElementById('formFIE').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const num = document.getElementById('fie-num').value.trim();
+  const mes = document.getElementById('fie-mes').value;
+  if(!num||!mes) { alert('Por favor completa: No. FIE y Mes.'); return; }
+  const fields = {};
+  document.querySelectorAll('.fie-field').forEach(el=>fields[el.dataset.col]=parseInt(el.value)||0);
+  const personal = getTagsValue('fie-personal-tags');
+  const unidades = getTagsValue('fie-unidades-tags');
+  const rec = {
+    id:Date.now(),
+    comandancia: DB.getStr('comandancia')||'—',
+    dia: document.getElementById('fie-dia').value,
+    mes, num,
+    hora: document.getElementById('fie-hora').value,
+    dir: document.getElementById('fie-direccion').value,
+    desc: document.getElementById('fie-descripcion').value,
+    personal, unidades,
+    obs: document.getElementById('fie-obs').value,
+    totalPob: parseInt(document.getElementById('fie-total-pob').value)||0,
+    totalServ: calcTotalServ(fields),
+    ...fields
+  };
+  const arr=DB.get('fie'); arr.push(rec); DB.set('fie',arr);
+  renderTablaFIE(); updateStats(); showAlert('fie-alert'); limpiarFIE();
+});
+
+function limpiarFIE() {
+  document.getElementById('formFIE').reset();
+  document.querySelectorAll('.fie-field').forEach(e=>e.value=0);
+  document.getElementById('fie-total-pob').value=0;
+  // Reset pills & panels
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.cat-panel').forEach(p=>p.classList.remove('show'));
+  // Hide pob panel
+  const pob=document.getElementById('panel-pob');
+  if(pob) pob.style.display='none';
+  const iconPob=document.getElementById('icon-pob');
+  if(iconPob) iconPob.className='bi bi-chevron-down';
+  clearTags('fie-personal-tags'); clearTags('fie-unidades-tags');
+}
+
+function renderTablaFIE(datos) {
+  const arr = datos||DB.get('fie');
+  const tb = document.getElementById('tbody-fie');
+  if(!arr.length){tb.innerHTML='<tr><td colspan="12" class="text-center text-secondary py-4"><i class="bi bi-inbox fs-3 d-block mb-2"></i>Sin registros aún.</td></tr>';return;}
+  tb.innerHTML=arr.map((r,i)=>`<tr>
+    <td>${i+1}</td><td>${r.dia||''}</td><td>${r.mes||''}</td>
+    <td><span class="badge badge-fire">${r.num||''}</span></td>
+    <td>${r.hora||'-'}</td>
+    <td><small>${r.comandancia||'-'}</small></td>
+    <td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${r.dir||''}">${r.dir||'-'}</td>
+    <td style="max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${r.personal||''}">${r.personal||'-'}</td>
+    <td style="max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.unidades||'-'}</td>
+    <td><span class="badge badge-fire">${r.totalServ||0}</span></td>
+    <td><span class="badge badge-ok">${r.totalPob||0}</span></td>
+    <td><button class="btn btn-outline-fire btn-sm py-0 px-2" onclick="eliminarFIE(${r.id})"><i class="bi bi-trash"></i></button></td>
+  </tr>`).join('');
+}
+
+function eliminarFIE(id){if(!confirm('¿Eliminar este registro?'))return; DB.set('fie',DB.get('fie').filter(r=>r.id!==id)); renderTablaFIE(); updateStats();}
+
+function filtrarTablaFIE(){
+  const q=document.getElementById('buscar-fie').value.toLowerCase();
+  const arr=DB.get('fie').filter(r=>(r.num||'').toLowerCase().includes(q)||(r.mes||'').toLowerCase().includes(q)||(r.dir||'').toLowerCase().includes(q)||(r.personal||'').toLowerCase().includes(q));
+  renderTablaFIE(arr);
+}
+
+function exportarCSV(){
+  const arr=DB.get('fie');
+  if(!arr.length){alert('No hay datos.');return;}
+  const h=['Día','Mes','No.FIE','Hora','Comandancia','Dirección','Descripción','Personal','Unidades','Total Servicios','Pob. Beneficiada','Observaciones'];
+  const rows=arr.map(r=>[r.dia,r.mes,r.num,r.hora,r.comandancia,r.dir,r.desc,r.personal,r.unidades,r.totalServ,r.totalPob,r.obs].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));
+  const csv=[h.join(','),...rows].join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='FIE_IBECH_'+new Date().getFullYear()+'.csv'; a.click();
+}
+
+// ═══════════════════════════════════
+//  FIC
+// ═══════════════════════════════════
+document.querySelectorAll('.fic-field').forEach(el=>{
+  el.addEventListener('input',()=>{
+    const tot=['mujeres','hombres','ninas','ninos'].reduce((s,c)=>{const e=document.querySelector(`.fic-field[data-col="${c}"]`);return s+(parseInt(e?.value)||0);},0);
+    document.getElementById('fic-total').value=tot;
+  });
+});
+
+document.getElementById('formFIC').addEventListener('submit',function(e){
+  e.preventDefault();
+  if(!document.getElementById('fic-num').value.trim()){alert('Ingresa el No. FIC.');return;}
+  const fields={};
+  document.querySelectorAll('.fic-field').forEach(el=>fields[el.dataset.col]=parseInt(el.value)||0);
+  const rec={id:Date.now(),
+    comandancia:DB.getStr('comandancia')||'—',
+    dia:document.getElementById('fic-dia').value,
+    mes:document.getElementById('fic-mes').value,
+    num:document.getElementById('fic-num').value,
+    horas:document.getElementById('fic-horas').value,
+    organismo:document.getElementById('fic-organismo').value,
+    tema:document.getElementById('fic-tema').value,
+    instructor: getTagsValue('fic-instructor-tags') || document.getElementById('fic-instructor-input').value,
+    total:parseInt(document.getElementById('fic-total').value)||0, ...fields
+  };
+  const arr=DB.get('fic'); arr.push(rec); DB.set('fic',arr);
+  renderTablaFIC(); updateStats(); showAlert('fic-alert'); limpiarFIC();
+});
+
+function limpiarFIC(){document.getElementById('formFIC').reset(); document.querySelectorAll('.fic-field').forEach(e=>e.value=0); document.getElementById('fic-total').value=0; clearTags('fic-instructor-tags');}
+
+function renderTablaFIC(){
+  const arr=DB.get('fic');
+  const tb=document.getElementById('tbody-fic');
+  if(!arr.length){tb.innerHTML='<tr><td colspan="16" class="text-center text-secondary py-4"><i class="bi bi-inbox fs-3 d-block mb-2"></i>Sin registros.</td></tr>';return;}
+  tb.innerHTML=arr.map((r,i)=>`<tr>
+    <td>${i+1}</td><td>${r.dia||''}</td><td>${r.mes||''}</td>
+    <td><span class="badge badge-fire">${r.num||''}</span></td>
+    <td>${r.horas||0}h</td><td>${r.organismo||'-'}</td>
+    <td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.tema||'-'}</td>
+    <td>${r.instructor||'-'}</td>
+    <td>${r.mujeres||0}</td><td>${r.hombres||0}</td><td>${r.ninas||0}</td><td>${r.ninos||0}</td>
+    <td>${r.discap||0}</td><td>${r.lgbt||0}</td>
+    <td><span class="badge badge-ok">${r.total||0}</span></td>
+    <td><button class="btn btn-outline-fire btn-sm py-0 px-2" onclick="eliminarFIC(${r.id})"><i class="bi bi-trash"></i></button></td>
+  </tr>`).join('');
+}
+
+function eliminarFIC(id){if(!confirm('¿Eliminar?'))return; DB.set('fic',DB.get('fic').filter(r=>r.id!==id)); renderTablaFIC(); updateStats();}
+
+// ═══════════════════════════════════
+//  PROFESIONALIZACIÓN
+// ═══════════════════════════════════
+['prof-mujeres','prof-hombres'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    const m=parseInt(document.getElementById('prof-mujeres').value)||0;
+    const h=parseInt(document.getElementById('prof-hombres').value)||0;
+    document.getElementById('prof-total').value=m+h;
+  });
+});
+
+document.getElementById('formProf').addEventListener('submit',function(e){
+  e.preventDefault();
+  if(!document.getElementById('prof-tema').value.trim()){alert('Ingresa el tema.');return;}
+  const rec={id:Date.now(),
+    comandancia:DB.getStr('comandancia')||'—',
+    dia:document.getElementById('prof-dia').value,
+    mes:document.getElementById('prof-mes').value,
+    horas:document.getElementById('prof-horas').value,
+    instructor:document.getElementById('prof-instructor').value,
+    procedencia:document.getElementById('prof-procedencia').value,
+    instalaciones:document.getElementById('prof-instalaciones').value,
+    tema:document.getElementById('prof-tema').value,
+    participantes: getTagsValue('prof-personal-tags'),
+    mujeres:parseInt(document.getElementById('prof-mujeres').value)||0,
+    hombres:parseInt(document.getElementById('prof-hombres').value)||0,
+    total:parseInt(document.getElementById('prof-total').value)||0
+  };
+  const arr=DB.get('prof'); arr.push(rec); DB.set('prof',arr);
+  renderTablaProf(); updateStats(); showAlert('prof-alert'); limpiarProf();
+});
+
+function limpiarProf(){document.getElementById('formProf').reset(); document.getElementById('prof-mujeres').value=0; document.getElementById('prof-hombres').value=0; document.getElementById('prof-total').value=0; clearTags('prof-personal-tags');}
+
+function renderTablaProf(){
+  const arr=DB.get('prof');
+  const tb=document.getElementById('tbody-prof');
+  if(!arr.length){tb.innerHTML='<tr><td colspan="13" class="text-center text-secondary py-4"><i class="bi bi-inbox fs-3 d-block mb-2"></i>Sin registros.</td></tr>';return;}
+  tb.innerHTML=arr.map((r,i)=>`<tr>
+    <td>${i+1}</td><td>${r.dia||''}</td><td>${r.mes||''}</td>
+    <td>${r.horas||0}h</td><td>${r.instructor||'-'}</td>
+    <td>${r.procedencia||'-'}</td><td>${r.instalaciones||'-'}</td>
+    <td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.tema||'-'}</td>
+    <td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${r.participantes||''}">${r.participantes||'-'}</td>
+    <td>${r.mujeres||0}</td><td>${r.hombres||0}</td>
+    <td><span class="badge badge-ok">${r.total||0}</span></td>
+    <td><button class="btn btn-outline-fire btn-sm py-0 px-2" onclick="eliminarProf(${r.id})"><i class="bi bi-trash"></i></button></td>
+  </tr>`).join('');
+}
+
+function eliminarProf(id){if(!confirm('¿Eliminar?'))return; DB.set('prof',DB.get('prof').filter(r=>r.id!==id)); renderTablaProf(); updateStats();}
+
+// ═══════════════════════════════════
+//  ESTADÍSTICAS
+// ═══════════════════════════════════
+function updateStats(){
+  const fie=DB.get('fie'), fic=DB.get('fic'), prof=DB.get('prof');
+  document.getElementById('stat-total-fie').textContent=fie.length;
+  document.getElementById('stat-incendios').textContent=fie.reduce((s,r)=>s+(r.casa_hab||0)+(r.comercio||0)+(r.pastizales||0)+(r.forestales||0)+(r.vehiculares||0)+(r.explosiones||0),0);
+  document.getElementById('stat-pob').textContent=fie.reduce((s,r)=>s+(r.totalPob||0),0);
+  document.getElementById('stat-cursos').textContent=fic.length+prof.length;
+
+  const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const res={};
+  meses.forEach(m=>res[m]={fuego:0,agua:0,fauna:0,acc:0,socio:0,byr:0,pob:0,total:0});
+  fie.forEach(r=>{
+    const m=r.mes; if(!res[m])return;
+    res[m].fuego+=(r.casa_hab||0)+(r.comercio||0)+(r.pastizales||0)+(r.forestales||0)+(r.vehiculares||0)+(r.explosiones||0)+(r.gas||0)+(r.sust_pel||0)+(r.mezclas||0);
+    res[m].agua+=(r.inundaciones||0)+(r.cables||0)+(r.espectaculares||0)+(r.arboles||0);
+    res[m].fauna+=(r.abejas||0)+(r.fauna_nociva||0);
+    res[m].acc+=(r.prehosp||0)+(r.derrame||0)+(r.extricacion||0)+(r.derrumbes||0);
+    res[m].socio+=(r.concentracion||0)+(r.prevencion||0)+(r.prop_agua||0);
+    res[m].byr+=(r.byr_prehosp||0)+(r.byr_vida||0)+(r.byr_cuerpos||0)+(r.byr_atrapadas||0);
+    res[m].pob+=r.totalPob||0; res[m].total+=r.totalServ||0;
+  });
+
+  const activos=meses.filter(m=>res[m].total>0);
+  const tb=document.getElementById('tbody-resumen');
+  if(!activos.length){tb.innerHTML='<tr><td colspan="9" class="text-center text-secondary py-4"><i class="bi bi-bar-chart fs-3 d-block mb-2"></i>Captura servicios para ver estadísticas.</td></tr>';document.getElementById('chart-bars').innerHTML='';document.getElementById('chart-empty').style.display='block';return;}
+  tb.innerHTML=activos.map(m=>`<tr>
+    <td><strong>${m}</strong></td>
+    <td>${res[m].fuego}</td><td>${res[m].agua}</td><td>${res[m].fauna}</td>
+    <td>${res[m].acc}</td><td>${res[m].socio}</td><td>${res[m].byr}</td>
+    <td><span class="badge badge-ok">${res[m].pob}</span></td>
+    <td><span class="badge badge-fire">${res[m].total}</span></td>
+  </tr>`).join('');
+
+  const cats=[
+    {l:'Fuego',v:fie.reduce((s,r)=>s+(r.casa_hab||0)+(r.comercio||0)+(r.pastizales||0)+(r.forestales||0)+(r.vehiculares||0)+(r.explosiones||0)+(r.gas||0)+(r.sust_pel||0)+(r.mezclas||0),0),c:'#c0392b'},
+    {l:'Agua/Aire',v:fie.reduce((s,r)=>s+(r.inundaciones||0)+(r.cables||0)+(r.espectaculares||0)+(r.arboles||0),0),c:'#2980b9'},
+    {l:'Fauna',v:fie.reduce((s,r)=>s+(r.abejas||0)+(r.fauna_nociva||0),0),c:'#27ae60'},
+    {l:'Accidentes',v:fie.reduce((s,r)=>s+(r.prehosp||0)+(r.derrame||0)+(r.extricacion||0)+(r.derrumbes||0),0),c:'#d35400'},
+    {l:'Socioorg.',v:fie.reduce((s,r)=>s+(r.concentracion||0)+(r.prevencion||0)+(r.prop_agua||0),0),c:'#8e44ad'},
+    {l:'B.y Rescate',v:fie.reduce((s,r)=>s+(r.byr_prehosp||0)+(r.byr_vida||0)+(r.byr_cuerpos||0)+(r.byr_atrapadas||0),0),c:'#f39c12'},
+  ];
+  const maxV=Math.max(...cats.map(c=>c.v),1);
+  document.getElementById('chart-empty').style.display='none';
+  document.getElementById('chart-bars').innerHTML=cats.map(c=>`
+    <div class="d-flex align-items-center mb-2 gap-2">
+      <div style="width:100px;font-size:.78rem;color:#aaa;text-align:right;flex-shrink:0;">${c.l}</div>
+      <div style="flex:1;background:#1a1a1a;border-radius:3px;height:26px;overflow:hidden;">
+        <div style="width:${Math.round(c.v/maxV*100)}%;background:${c.c};height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;transition:width .6s;">
+          <span style="font-size:.78rem;color:#fff;font-family:'Oswald',sans-serif;">${c.v>0?c.v:''}</span>
+        </div>
+      </div>
+      <div style="width:28px;font-family:'Oswald',sans-serif;font-size:.88rem;color:#ccc;">${c.v}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════
+function showAlert(id){const el=document.getElementById(id);if(!el)return;el.classList.remove('d-none');setTimeout(()=>el.classList.add('d-none'),3500);}
+function showAlertMsg(id,msg){const el=document.getElementById(id);const msgEl=document.getElementById(id+'-msg');if(el&&msgEl){msgEl.textContent=msg;el.classList.remove('d-none');setTimeout(()=>el.classList.add('d-none'),4000);}}
+
+// ═══════════════════════════════════
+//  TOGGLE CATEGORÍAS FIE (pills)
+// ═══════════════════════════════════
+function toggleCat(cat) {
+  const pill = document.querySelector(`.cat-pill[data-cat="${cat}"]`);
+  const panel = document.getElementById(`panel-${cat}`);
+  if (!pill || !panel) return;
+  const isActive = pill.classList.contains('active');
+  pill.classList.toggle('active', !isActive);
+  panel.classList.toggle('show', !isActive);
+  // reset fields when closing
+  if (isActive) {
+    panel.querySelectorAll('.fie-field').forEach(el => { el.value = 0; });
+    recalcPob();
+  }
+}
+
+function togglePob() {
+  const panel = document.getElementById('panel-pob');
+  const icon = document.getElementById('icon-pob');
+  const isHidden = panel.style.display === 'none' || panel.style.display === '';
+  panel.style.display = isHidden ? 'block' : 'none';
+  icon.className = isHidden ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+}
+
+function recalcPob() {
+  const tot = [...document.querySelectorAll('.pob-field')].reduce((s,e)=>s+(parseInt(e.value)||0),0);
+  const el = document.getElementById('fie-total-pob');
+  if(el) el.value = tot;
+}
+
+// ═══════════════════════════════════
+//  TOGGLE FORMULARIO FIE
+// ═══════════════════════════════════
+function toggleFormFIE(){
+  const collapse=document.getElementById('formFIE-collapse');
+  const icon=document.getElementById('icon-toggle-fie');
+  const isHidden=collapse.style.display==='none';
+  collapse.style.display=isHidden?'block':'none';
+  icon.className=isHidden?'bi bi-chevron-up':'bi bi-chevron-down';
+}
+
+// ═══════════════════════════════════
+//  HELPERS DE REPORTE
+// ═══════════════════════════════════
+function getDatosReporte(){
+  const mes=document.getElementById('rep-mes')?.value||'';
+  const tipo=document.getElementById('rep-tipo')?.value||'fie';
+  const com=DB.getStr('comandancia')||'IBECH';
+  let fie=DB.get('fie'), fic=DB.get('fic'), prof=DB.get('prof');
+  if(mes){ fie=fie.filter(r=>r.mes===mes); fic=fic.filter(r=>r.mes===mes); prof=prof.filter(r=>r.mes===mes); }
+  return {mes,tipo,com,fie,fic,prof};
+}
+
+function generarTextoReporte(){
+  const {mes,tipo,com,fie,fic,prof}=getDatosReporte();
+  const periodo=mes||'Año completo';
+  let txt=`🚒 *IBECH - Instituto de Bomberos del Estado de Chiapas*\n`;
+  txt+=`📍 Comandancia: ${com}\n📅 Período: ${periodo}\n`;
+  txt+=`${'─'.repeat(35)}\n`;
+  if(tipo==='fie'||tipo==='todo'){
+    const totalServ=fie.reduce((s,r)=>s+(r.totalServ||0),0);
+    const totalPob=fie.reduce((s,r)=>s+(r.totalPob||0),0);
+    txt+=`\n🔥 *SERVICIOS (FIE)*\n`;
+    txt+=`• Registros: ${fie.length}\n`;
+    txt+=`• Total servicios: ${totalServ}\n`;
+    txt+=`• Población beneficiada: ${totalPob}\n`;
+    const incendios=fie.reduce((s,r)=>s+(r.casa_hab||0)+(r.comercio||0)+(r.pastizales||0)+(r.forestales||0)+(r.vehiculares||0)+(r.explosiones||0),0);
+    txt+=`• Incendios: ${incendios}\n`;
+  }
+  if(tipo==='fic'||tipo==='todo'){
+    const totalBen=fic.reduce((s,r)=>s+(r.total||0),0);
+    txt+=`\n📚 *CURSOS IMPARTIDOS (FIC)*\n`;
+    txt+=`• Cursos: ${fic.length}\n`;
+    txt+=`• Beneficiarios: ${totalBen}\n`;
+  }
+  if(tipo==='prof'||tipo==='todo'){
+    const totalPart=prof.reduce((s,r)=>s+(r.total||0),0);
+    txt+=`\n🏅 *PROFESIONALIZACIÓN*\n`;
+    txt+=`• Cursos recibidos: ${prof.length}\n`;
+    txt+=`• Participantes: ${totalPart}\n`;
+  }
+  txt+=`\n${'─'.repeat(35)}\nGenerado: ${new Date().toLocaleString('es-MX')}`;
+  return txt;
+}
+
+// ═══════════════════════════════════
+//  WHATSAPP
+// ═══════════════════════════════════
+function compartirWhatsApp(){
+  const txt=generarTextoReporte();
+  const url='https://wa.me/?text='+encodeURIComponent(txt);
+  window.open(url,'_blank');
+  showAlertMsg('rep-alert','Se abrió WhatsApp con el reporte listo para enviar.');
+}
+
+// ═══════════════════════════════════
+//  PDF (via print con estilos)
+// ═══════════════════════════════════
+function descargarPDF(){
+  const {mes,tipo,com,fie,fic,prof}=getDatosReporte();
+  const periodo=mes||'Año completo';
+  const totalServ=fie.reduce((s,r)=>s+(r.totalServ||0),0);
+  const totalPob=fie.reduce((s,r)=>s+(r.totalPob||0),0);
+  const incendios=fie.reduce((s,r)=>s+(r.casa_hab||0)+(r.comercio||0)+(r.pastizales||0)+(r.forestales||0)+(r.vehiculares||0)+(r.explosiones||0),0);
+  const totalFIC=fic.reduce((s,r)=>s+(r.total||0),0);
+  const totalProf=prof.reduce((s,r)=>s+(r.total||0),0);
+
+  const filas=fie.map((r,i)=>`<tr>
+    <td>${i+1}</td><td>${r.dia||''}/${r.mes||''}</td><td>${r.num||''}</td>
+    <td>${r.dir||'-'}</td><td>${r.personal||'-'}</td><td>${r.totalServ||0}</td><td>${r.totalPob||0}</td>
+  </tr>`).join('');
+
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>
+  <title>Reporte IBECH ${periodo}</title>
+  <style>
+    body{font-family:Arial,sans-serif;color:#000;padding:20px;font-size:11px;}
+    h1{font-size:15px;text-align:center;border-bottom:3px solid #c0392b;padding-bottom:8px;margin-bottom:4px;}
+    h2{font-size:12px;border-bottom:1px solid #ccc;padding-bottom:4px;margin:16px 0 8px;color:#c0392b;}
+    .meta{text-align:center;font-size:10px;color:#666;margin-bottom:16px;}
+    .resumen{display:flex;gap:16px;margin-bottom:16px;}
+    .stat{flex:1;border:1px solid #ddd;border-top:3px solid #c0392b;padding:10px;text-align:center;border-radius:4px;}
+    .stat .num{font-size:22px;font-weight:bold;color:#c0392b;}
+    .stat .lbl{font-size:9px;color:#888;text-transform:uppercase;}
+    table{width:100%;border-collapse:collapse;font-size:10px;}
+    th{background:#c0392b;color:#fff;padding:5px 6px;text-align:left;}
+    td{padding:4px 6px;border-bottom:1px solid #eee;}
+    tr:nth-child(even) td{background:#fafafa;}
+    .footer{margin-top:20px;font-size:9px;color:#aaa;text-align:center;}
+    @media print{body{padding:10px;}}
+  </style></head><body>
+  <h1>🚒 Instituto de Bomberos del Estado de Chiapas</h1>
+  <div class="meta">Comandancia: ${com} &nbsp;·&nbsp; Período: ${periodo} &nbsp;·&nbsp; Generado: ${new Date().toLocaleString('es-MX')}</div>
+  <div class="resumen">
+    <div class="stat"><div class="num">${fie.length}</div><div class="lbl">Servicios FIE</div></div>
+    <div class="stat"><div class="num">${totalServ}</div><div class="lbl">Total Intervenciones</div></div>
+    <div class="stat"><div class="num">${totalPob}</div><div class="lbl">Pob. Beneficiada</div></div>
+    <div class="stat"><div class="num">${incendios}</div><div class="lbl">Incendios</div></div>
+    <div class="stat"><div class="num">${fic.length}</div><div class="lbl">Cursos FIC</div></div>
+    <div class="stat"><div class="num">${totalFIC}</div><div class="lbl">Beneficiarios FIC</div></div>
+  </div>
+  ${(tipo==='fie'||tipo==='todo')&&fie.length?`
+  <h2>📋 Registro de Servicios (FIE)</h2>
+  <table><thead><tr><th>#</th><th>Fecha</th><th>No. FIE</th><th>Dirección</th><th>Personal</th><th>T.Serv.</th><th>Pob.</th></tr></thead>
+  <tbody>${filas}</tbody></table>`:''}
+  <div class="footer">Instituto de Bomberos del Estado de Chiapas (IBECH) · Sistema de Gestión Operativa</div>
+  </body></html>`;
+
+  const win=window.open('','_blank');
+  win.document.write(html);
+  win.document.close();
+  win.onload=()=>{ win.print(); };
+  showAlertMsg('rep-alert','Se abrió la ventana de impresión para guardar como PDF.');
+}
+
+// ═══════════════════════════════════
+//  CSV REPORTE
+// ═══════════════════════════════════
+function descargarCSVReporte(){
+  const {mes,tipo,com,fie,fic,prof}=getDatosReporte();
+  let csv='';
+  if(tipo==='fie'||tipo==='todo'){
+    const h=['Día','Mes','No.FIE','Hora','Comandancia','Dirección','Descripción','Personal','Unidades','Total Servicios','Pob. Beneficiada','Observaciones'];
+    const rows=fie.map(r=>[r.dia,r.mes,r.num,r.hora,r.comandancia,r.dir,r.desc,r.personal,r.unidades,r.totalServ,r.totalPob,r.obs].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));
+    csv+=tipo==='todo'?'SERVICIOS FIE\n':'';
+    csv+=[h.join(','),...rows].join('\n')+'\n\n';
+  }
+  if(tipo==='fic'||tipo==='todo'){
+    const h=['Día','Mes','No.FIC','Hrs','Organismo','Tema','Instructor','Mujeres','Hombres','Niñas','Niños','Disc.','LGBT+','Total'];
+    const rows=fic.map(r=>[r.dia,r.mes,r.num,r.horas,r.organismo,r.tema,r.instructor,r.mujeres||0,r.hombres||0,r.ninas||0,r.ninos||0,r.discap||0,r.lgbt||0,r.total].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));
+    csv+=tipo==='todo'?'CURSOS IMPARTIDOS FIC\n':'';
+    csv+=[h.join(','),...rows].join('\n')+'\n\n';
+  }
+  if(tipo==='prof'||tipo==='todo'){
+    const h=['Día','Mes','Hrs','Instructor','Procedencia','Instalaciones','Tema','Participantes','Mujeres','Hombres','Total'];
+    const rows=prof.map(r=>[r.dia,r.mes,r.horas,r.instructor,r.procedencia,r.instalaciones,r.tema,r.participantes,r.mujeres||0,r.hombres||0,r.total].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));
+    csv+=tipo==='todo'?'PROFESIONALIZACIÓN\n':'';
+    csv+=[h.join(','),...rows].join('\n');
+  }
+  const mesStr=mes?mes.substring(0,3):'Todo';
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download=`IBECH_${tipo.toUpperCase()}_${mesStr}_${new Date().getFullYear()}.csv`; a.click();
+  showAlertMsg('rep-alert','CSV descargado correctamente.');
+}
+
+// ═══════════════════════════════════
+//  JSON BACKUP / RESTORE
+// ═══════════════════════════════════
+function descargarJSON(){
+  const data={
+    version:'1.0',
+    fecha:new Date().toISOString(),
+    comandancia:DB.getStr('comandancia'),
+    personal:DB.get('personal'),
+    unidades:DB.get('unidades'),
+    fie:DB.get('fie'),
+    fic:DB.get('fic'),
+    prof:DB.get('prof')
+  };
+  const a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data,null,2));
+  a.download='IBECH_respaldo_'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+}
+
+function cargarJSON(){
+  const file=document.getElementById('input-json').files[0];
+  if(!file){alert('Selecciona un archivo JSON.');return;}
+  if(!confirm('⚠️ Esta acción REEMPLAZARÁ todos los datos actuales con los del archivo. ¿Continuar?'))return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(data.personal) DB.set('personal',data.personal);
+      if(data.unidades) DB.set('unidades',data.unidades);
+      if(data.fie) DB.set('fie',data.fie);
+      if(data.fic) DB.set('fic',data.fic);
+      if(data.prof) DB.set('prof',data.prof);
+      if(data.comandancia) DB.setStr('comandancia',data.comandancia);
+      renderPersonal(); renderUnidades(); renderTablaFIE(); renderTablaFIC(); renderTablaProf();
+      updateStats(); actualizarLabelsComandancia(); actualizarSysInfo();
+      showAlertMsg('json-alert',`Datos restaurados correctamente. (${data.fie?.length||0} FIE, ${data.fic?.length||0} FIC, ${data.prof?.length||0} Prof.)`);
+      document.getElementById('input-json').value='';
+    }catch(err){alert('Error al leer el archivo JSON: '+err.message);}
+  };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════
+//  CSV PLANTILLAS
+// ═══════════════════════════════════
+function descargarPlantillaCSV(tipo){
+  const plantillas={
+    fie:'Día,Mes,No. FIE,Hora,Dirección,Descripción,Personal,Unidades,Casa Habitación,Comercio/Industria,Pastizales,Forestales,Vehículos,Explosiones,Fugas de Gas,Sust. Peligrosas,Mezclas Inflamables,Inundaciones,Cables Caídos,Espectaculares,Seccionar Árboles,Retiro Abejas,Fauna Nociva,Prehospitalaria,Derrame/Fuga,Extricación,Derrumbes,Concentración Masiva,Prevención,Proporcionar Agua,BYR Prehospitalaria,BYR Rescate con Vida,BYR Cuerpos Sin Vida,BYR Atrapados,Muj 16-59,Muj Mayores,Muj Discap,Hom 16-59,Hom Mayores,Hom Discap,Niñas,Niños,LGBT+,Observaciones\n1,Enero,001,09:00,Calle Ejemplo #1,Descripción del servicio,Juan Pérez,Unidad 201,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,2,0,0,0,0,0,',
+    fic:'Día,Mes,No. FIC,Duración (hrs),Organismo,Tema,Instructor,Mujeres,Hombres,Niñas,Niños,P. c/Discapacidad,LGBT+\n1,Enero,001,4,Escuela Primaria Ejemplo,Primeros Auxilios Básicos,Juan Pérez,10,8,5,5,0,0',
+    prof:'Día,Mes,Duración (hrs),Instructor,Procedencia,Instalaciones,Tema,Participantes,Mujeres,Hombres\n1,Enero,8,Dr. Instructor,CENAPRED,Cuartel Central,Rescate en Estructuras Colapsadas,Juan Pérez / María García,1,1',
+    personal:'Nombre,Cargo,Edad,Matrícula,Teléfono,Contacto de Emergencia,Turno\nJuan Pérez López,Bombero de 1ª,28,0042,961 234 5678,María López 961 987 6543,Guardia A'
+  };
+  const nombres={fie:'Plantilla_FIE',fic:'Plantilla_FIC',prof:'Plantilla_Profesionalizacion',personal:'Plantilla_Personal'};
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(plantillas[tipo]);
+  a.download=nombres[tipo]+'_IBECH.csv'; a.click();
+}
+
+function cargarCSV(){
+  const file=document.getElementById('input-csv').files[0];
+  const tipo=document.getElementById('csv-tipo').value;
+  if(!file){alert('Selecciona un archivo CSV.');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const lines=e.target.result.replace(/\r/g,'').split('\n').filter(l=>l.trim());
+      if(lines.length<2){alert('El CSV debe tener encabezado y al menos una fila de datos.');return;}
+      const headers=lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,''));
+      const rows=lines.slice(1).map(l=>{
+        const vals=[]; let inQ=false,cur='';
+        for(const c of l){ if(c==='"'){inQ=!inQ;}else if(c===','&&!inQ){vals.push(cur.trim());cur='';}else{cur+=c;} }
+        vals.push(cur.trim()); return vals;
+      });
+
+      let added=0;
+      if(tipo==='fie'){
+        const arr=DB.get('fie');
+        rows.forEach(r=>{
+          if(!r[0]&&!r[2])return;
+          arr.push({id:Date.now()+Math.random(),dia:r[0],mes:r[1],num:r[2],hora:r[3],dir:r[4],desc:r[5],personal:r[6],unidades:r[7],
+            casa_hab:+r[8]||0,comercio:+r[9]||0,pastizales:+r[10]||0,forestales:+r[11]||0,vehiculares:+r[12]||0,explosiones:+r[13]||0,
+            gas:+r[14]||0,sust_pel:+r[15]||0,mezclas:+r[16]||0,inundaciones:+r[17]||0,cables:+r[18]||0,espectaculares:+r[19]||0,
+            arboles:+r[20]||0,abejas:+r[21]||0,fauna_nociva:+r[22]||0,prehosp:+r[23]||0,derrame:+r[24]||0,extricacion:+r[25]||0,
+            derrumbes:+r[26]||0,concentracion:+r[27]||0,prevencion:+r[28]||0,prop_agua:+r[29]||0,
+            byr_prehosp:+r[30]||0,byr_vida:+r[31]||0,byr_cuerpos:+r[32]||0,byr_atrapadas:+r[33]||0,
+            muj_adultas:+r[34]||0,muj_mayores:+r[35]||0,muj_discap:+r[36]||0,
+            hom_adultos:+r[37]||0,hom_mayores:+r[38]||0,hom_discap:+r[39]||0,
+            ninas:+r[40]||0,ninos:+r[41]||0,lgbt:+r[42]||0,obs:r[43]||'',
+            totalPob:(+r[34]||0)+(+r[35]||0)+(+r[36]||0)+(+r[37]||0)+(+r[38]||0)+(+r[39]||0)+(+r[40]||0)+(+r[41]||0)+(+r[42]||0),
+            totalServ:([8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33].reduce((s,i)=>s+(+r[i]||0),0)),
+            comandancia:DB.getStr('comandancia')||'—'});
+          added++;
+        });
+        DB.set('fie',arr); renderTablaFIE();
+      }else if(tipo==='fic'){
+        const arr=DB.get('fic');
+        rows.forEach(r=>{
+          if(!r[0])return;
+          arr.push({id:Date.now()+Math.random(),dia:r[0],mes:r[1],num:r[2],horas:r[3],organismo:r[4],tema:r[5],instructor:r[6],
+            mujeres:+r[7]||0,hombres:+r[8]||0,ninas:+r[9]||0,ninos:+r[10]||0,discap:+r[11]||0,lgbt:+r[12]||0,
+            total:(+r[7]||0)+(+r[8]||0)+(+r[9]||0)+(+r[10]||0),comandancia:DB.getStr('comandancia')||'—'});
+          added++;
+        });
+        DB.set('fic',arr); renderTablaFIC();
+      }else if(tipo==='prof'){
+        const arr=DB.get('prof');
+        rows.forEach(r=>{
+          if(!r[0])return;
+          arr.push({id:Date.now()+Math.random(),dia:r[0],mes:r[1],horas:r[2],instructor:r[3],procedencia:r[4],instalaciones:r[5],
+            tema:r[6],participantes:r[7],mujeres:+r[8]||0,hombres:+r[9]||0,total:(+r[8]||0)+(+r[9]||0),
+            comandancia:DB.getStr('comandancia')||'—'});
+          added++;
+        });
+        DB.set('prof',arr); renderTablaProf();
+      }else if(tipo==='personal'){
+        const arr=DB.get('personal');
+        rows.forEach(r=>{
+          if(!r[0])return;
+          arr.push({id:Date.now()+Math.random(),nombre:r[0],cargo:r[1],edad:r[2],matricula:r[3],telefono:r[4],contacto:r[5],turno:r[6],activo:true});
+          added++;
+        });
+        DB.set('personal',arr); renderPersonal();
+      }
+      updateStats(); actualizarSysInfo();
+      showAlertMsg('csv-alert',`${added} registro(s) importado(s) correctamente desde el CSV.`);
+      document.getElementById('input-csv').value='';
+    }catch(err){alert('Error al leer el CSV: '+err.message);}
+  };
+  reader.readAsText(file,'utf-8');
+}
+
+// ═══════════════════════════════════
+//  SYS INFO
+// ═══════════════════════════════════
+function actualizarSysInfo(){
+  const setN=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  setN('sys-personal',DB.get('personal').length);
+  setN('sys-unidades',DB.get('unidades').length);
+  setN('sys-fie',DB.get('fie').length);
+  setN('sys-cursos',DB.get('fic').length+DB.get('prof').length);
+}
+
+function borrarTodosLosDatos(){
+  if(!confirm('⚠️ ¿Estás SEGURO? Se eliminarán TODOS los datos (personal, unidades, FIE, FIC, profesionalización). Esta acción no se puede deshacer.'))return;
+  if(!confirm('Segunda confirmación: ¿Borrar absolutamente todo?'))return;
+  ['personal','unidades','fie','fic','prof'].forEach(k=>DB.set(k,[]));
+  renderPersonal(); renderUnidades(); renderTablaFIE(); renderTablaFIC(); renderTablaProf();
+  updateStats(); actualizarSysInfo();
+  alert('Todos los datos han sido eliminados.');
+}
+
+// ═══════════════════════════════════
+//  INIT
+// ═══════════════════════════════════
+actualizarLabelsComandancia();
+renderPersonal();
+renderUnidades();
+renderTablaFIE();
+renderTablaFIC();
+renderTablaProf();
+updateStats();
+actualizarSysInfo();
+</script>
+</body>
+</html>
