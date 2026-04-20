@@ -128,6 +128,7 @@ textarea.form-control{resize:vertical;}
 .cat-panel{display:none;background:var(--bg3);border:1px solid var(--borde2);border-radius:var(--radio);overflow:hidden;margin-bottom:10px;}
 .cat-panel.show{display:block;animation:fadeIn .2s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 .cat-panel-head{padding:8px 14px;font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:7px;}
 .cat-panel-body{padding:14px;}
 
@@ -244,6 +245,23 @@ textarea.form-control{resize:vertical;}
 .login-sub{font-size:.75rem;color:var(--texto3);text-align:center;letter-spacing:.8px;text-transform:uppercase;margin-bottom:28px;}
 .login-err{background:rgba(211,47,47,.15);border:1px solid rgba(211,47,47,.4);color:var(--rojo-l);border-radius:var(--radio-sm);padding:8px 12px;font-size:.82rem;margin-bottom:12px;display:none;}
 .login-footer{font-size:.7rem;color:var(--texto3);text-align:center;margin-top:20px;}
+/* PIN pad */
+.user-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:20px;}
+.user-pill{background:var(--bg3);border:2px solid var(--borde2);border-radius:var(--radio);padding:10px 12px;cursor:pointer;transition:all .18s;text-align:center;}
+.user-pill:hover{border-color:var(--rojo-l);background:rgba(211,47,47,.08);}
+.user-pill.selected{border-color:var(--rojo);background:rgba(211,47,47,.15);box-shadow:0 0 0 2px rgba(211,47,47,.2);}
+.user-pill .up-name{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:700;color:#fff;line-height:1.2;}
+.user-pill .up-role{font-size:.65rem;color:var(--texto3);text-transform:uppercase;letter-spacing:.5px;}
+.pin-dots{display:flex;justify-content:center;gap:12px;margin:16px 0 8px;}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--borde2);background:transparent;transition:all .15s;}
+.pin-dot.filled{background:var(--rojo);border-color:var(--rojo);box-shadow:0 0 6px rgba(211,47,47,.5);}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:0 auto;}
+.pin-btn{background:var(--bg3);border:1px solid var(--borde2);border-radius:var(--radio);padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:700;color:#fff;cursor:pointer;transition:all .15s;text-align:center;}
+.pin-btn:hover{background:var(--bg4);border-color:var(--borde2);}
+.pin-btn:active{background:rgba(211,47,47,.2);border-color:var(--rojo);transform:scale(.96);}
+.pin-btn.del{color:var(--texto2);font-size:1rem;}
+.pin-btn.empty{background:transparent;border:none;cursor:default;}
+.login-step{display:none;}.login-step.active{display:block;}
 
 /* ══ ADMIN PANEL ══ */
 .user-card{background:var(--bg3);border:1px solid var(--borde);border-radius:var(--radio);padding:13px 16px;position:relative;transition:border-color .15s;}
@@ -316,25 +334,55 @@ textarea.form-control{resize:vertical;}
 
 <!-- ═══ LOGIN ═══ -->
 <div id="login-screen">
-  <div class="login-box">
+  <div class="login-box" style="max-width:440px;">
     <div class="login-logo">
       <img src="https://drive.google.com/thumbnail?id=1YfRk7wfbwLLwYq56AlzHoWblWEoyJUBS&sz=w200" alt="IBECH" onerror="this.parentElement.innerHTML='🔥'"/>
     </div>
     <div class="login-title">IBECH</div>
     <div class="login-sub">Sistema de Gestión Operativa · 2026</div>
-    <div class="login-err" id="login-err"><i class="bi bi-exclamation-triangle me-2"></i><span id="login-err-msg">Usuario o contraseña incorrectos.</span></div>
-    <div class="mb-3">
-      <label class="form-label">Usuario</label>
-      <input type="text" class="form-control" id="login-user" placeholder="Ingresa tu usuario" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()"/>
-    </div>
-    <div class="mb-4">
-      <label class="form-label">Contraseña</label>
-      <div style="position:relative;">
-        <input type="password" class="form-control" id="login-pass" placeholder="Contraseña" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" style="padding-right:40px;"/>
-        <button type="button" onclick="togglePassVis()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--texto3);cursor:pointer;"><i class="bi bi-eye" id="pass-eye"></i></button>
+    <div class="login-err" id="login-err"><i class="bi bi-exclamation-triangle me-2"></i><span id="login-err-msg">Selecciona un usuario.</span></div>
+
+    <!-- PASO 1: Seleccionar usuario -->
+    <div class="login-step active" id="step-usuario">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--texto3);margin-bottom:10px;">Selecciona tu usuario</div>
+      <div class="user-grid" id="user-grid">
+        <div style="color:var(--texto3);font-size:.82rem;text-align:center;padding:20px 0;">Cargando usuarios...</div>
       </div>
     </div>
-    <button class="btn-rojo w-100" style="justify-content:center;padding:10px;" onclick="doLogin()"><i class="bi bi-box-arrow-in-right me-1"></i>Ingresar</button>
+
+    <!-- PASO 2: Ingresar PIN de 4 dígitos -->
+    <div class="login-step" id="step-pin">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <button onclick="volverPaso1()" style="background:none;border:none;color:var(--texto3);cursor:pointer;font-size:1.1rem;padding:0;"><i class="bi bi-arrow-left"></i></button>
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:#fff;" id="pin-nombre-sel">—</div>
+          <div style="font-size:.7rem;color:var(--texto3);">Ingresa tu PIN de 4 dígitos</div>
+        </div>
+      </div>
+      <!-- Puntos indicadores -->
+      <div class="pin-dots">
+        <div class="pin-dot" id="pd0"></div>
+        <div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div>
+        <div class="pin-dot" id="pd3"></div>
+      </div>
+      <!-- Teclado numérico -->
+      <div class="pin-pad">
+        <button class="pin-btn" onclick="pinTecla('1')">1</button>
+        <button class="pin-btn" onclick="pinTecla('2')">2</button>
+        <button class="pin-btn" onclick="pinTecla('3')">3</button>
+        <button class="pin-btn" onclick="pinTecla('4')">4</button>
+        <button class="pin-btn" onclick="pinTecla('5')">5</button>
+        <button class="pin-btn" onclick="pinTecla('6')">6</button>
+        <button class="pin-btn" onclick="pinTecla('7')">7</button>
+        <button class="pin-btn" onclick="pinTecla('8')">8</button>
+        <button class="pin-btn" onclick="pinTecla('9')">9</button>
+        <div class="pin-btn empty"></div>
+        <button class="pin-btn" onclick="pinTecla('0')">0</button>
+        <button class="pin-btn del" onclick="pinBorrar()"><i class="bi bi-backspace"></i></button>
+      </div>
+    </div>
+
     <div class="login-footer">Instituto de Bomberos del Estado de Chiapas</div>
   </div>
 </div>
@@ -1296,7 +1344,7 @@ textarea.form-control{resize:vertical;}
           </div>
           <div class="col-6 col-md-2">
             <label class="form-label">Contraseña *</label>
-            <input type="text" class="form-control form-control-sm" id="nu-pass" required placeholder="Contraseña inicial" autocomplete="off"/>
+            <input type="text" class="form-control form-control-sm" id="nu-pass" required placeholder="PIN 4 dígitos" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" autocomplete="off"/>
           </div>
           <div class="col-6 col-md-2">
             <label class="form-label">Rol *</label>
@@ -1350,7 +1398,7 @@ textarea.form-control{resize:vertical;}
           <input type="hidden" id="eu-id"/>
           <div class="row g-2">
             <div class="col-12"><label class="form-label">Nombre Completo</label><input type="text" class="form-control form-control-sm" id="eu-nombre"/></div>
-            <div class="col-6"><label class="form-label">Nueva Contraseña</label><input type="text" class="form-control form-control-sm" id="eu-pass" placeholder="Dejar vacío para no cambiar" autocomplete="off"/></div>
+            <div class="col-6"><label class="form-label">Nueva Contraseña</label><input type="text" class="form-control form-control-sm" id="eu-pass" placeholder="Nuevo PIN (4 dígitos, vacío=no cambiar)" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" autocomplete="off"/></div>
             <div class="col-6"><label class="form-label">Rol</label>
               <select class="form-select form-select-sm" id="eu-rol">
                 <option value="usuario">Usuario</option><option value="admin">Administrador</option>
@@ -2725,47 +2773,132 @@ function showAlMsg(id,msgId,msg){const e=document.getElementById(id),m=document.
 let SESION = null; // {username, nombre, rol, comandancia}
 let FILTRO_MES = '__all__';
 
+// PIN actual ingresado y usuario seleccionado en login
+let pinActual = '';
+let loginUsuarioSel = null;
+
 function initUsuarios(){
   let users = DB.get('usuarios');
   if(!users.length){
-    // Usuario admin por defecto
+    // Usuario admin por defecto — PIN: 1234
     users = [{id:'admin_default',username:'admin',nombre:'Administrador IBECH',
-      pass:btoa('ibech2026'),rol:'admin',comandancia:'',activo:true}];
+      pass:btoa('1234'),rol:'admin',comandancia:'',activo:true}];
     DB.set('usuarios',users);
   }
 }
 
-function doLogin(){
-  const u = document.getElementById('login-user').value.trim().toLowerCase();
-  const p = document.getElementById('login-pass').value;
-  const err = document.getElementById('login-err');
-  if(!u||!p){err.style.display='block';document.getElementById('login-err-msg').textContent='Ingresa usuario y contraseña.';return;}
+function renderUserGrid(){
+  const grid = document.getElementById('user-grid');
+  if(!grid) return;
+  const users = DB.get('usuarios')
+    .filter(u=>u.activo!==false)
+    .sort((a,b)=>{
+      // Admins primero, luego alfabético por nombre
+      if(a.rol==='admin' && b.rol!=='admin') return -1;
+      if(a.rol!=='admin' && b.rol==='admin') return 1;
+      return a.nombre.localeCompare(b.nombre,'es');
+    });
+  if(!users.length){
+    grid.innerHTML='<div style="color:var(--texto3);font-size:.82rem;text-align:center;padding:20px 0;grid-column:1/-1;">No hay usuarios registrados.</div>';
+    return;
+  }
+  grid.innerHTML = users.map(u=>`
+    <div class="user-pill" onclick="seleccionarUsuario('${u.id}')">
+      <div class="up-name">${u.nombre}</div>
+      <div class="up-role">${u.rol==='admin'?'🔴 Admin':'🔵 Usuario'}</div>
+    </div>`).join('');
+}
+
+function seleccionarUsuario(id){
   const users = DB.get('usuarios');
-  const user = users.find(x=>x.username.toLowerCase()===u && atob(x.pass)===p && x.activo!==false);
-  if(!user){err.style.display='block';document.getElementById('login-err-msg').textContent='Usuario o contraseña incorrectos.';
-    registrarHistorial(u,'login','⛔ Intento de acceso fallido','login');return;}
-  SESION = {username:user.username,nombre:user.nombre,rol:user.rol,comandancia:user.comandancia||''};
-  err.style.display='none';
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('app-wrapper').style.display='block';
-  registrarHistorial(SESION.username,'login','✅ Inicio de sesión exitoso','login');
-  aplicarSesion();
-  init();
+  loginUsuarioSel = users.find(u=>String(u.id)===String(id));
+  if(!loginUsuarioSel) return;
+  pinActual = '';
+  actualizarPinDots();
+  document.getElementById('pin-nombre-sel').textContent = loginUsuarioSel.nombre;
+  document.getElementById('step-usuario').classList.remove('active');
+  document.getElementById('step-pin').classList.add('active');
+  document.getElementById('login-err').style.display='none';
+  // Marcar seleccionado
+  document.querySelectorAll('.user-pill').forEach(p=>p.classList.remove('selected'));
+}
+
+function volverPaso1(){
+  document.getElementById('step-pin').classList.remove('active');
+  document.getElementById('step-usuario').classList.add('active');
+  pinActual='';
+  loginUsuarioSel=null;
+  actualizarPinDots();
+  document.getElementById('login-err').style.display='none';
+}
+
+function pinTecla(d){
+  if(pinActual.length>=4) return;
+  pinActual += d;
+  actualizarPinDots();
+  if(pinActual.length===4) setTimeout(confirmarPin,120);
+}
+
+function pinBorrar(){
+  if(!pinActual.length) return;
+  pinActual = pinActual.slice(0,-1);
+  actualizarPinDots();
+}
+
+function actualizarPinDots(){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('pd'+i);
+    if(d) d.className='pin-dot'+(i<pinActual.length?' filled':'');
+  }
+}
+
+function confirmarPin(){
+  const err = document.getElementById('login-err');
+  if(!loginUsuarioSel){volverPaso1();return;}
+  if(atob(loginUsuarioSel.pass)===pinActual){
+    // LOGIN OK
+    err.style.display='none';
+    SESION={username:loginUsuarioSel.username,nombre:loginUsuarioSel.nombre,
+            rol:loginUsuarioSel.rol,comandancia:loginUsuarioSel.comandancia||''};
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app-wrapper').style.display='block';
+    registrarHistorial(SESION.username,'login','✅ Inicio de sesión exitoso','login');
+    aplicarSesion();
+    init();
+  } else {
+    // PIN incorrecto
+    registrarHistorial(loginUsuarioSel.username,'login','⛔ PIN incorrecto','login');
+    err.style.display='block';
+    document.getElementById('login-err-msg').textContent='PIN incorrecto. Intenta de nuevo.';
+    pinActual='';
+    actualizarPinDots();
+    // Shake animation
+    const box = document.querySelector('.login-box');
+    box.style.animation='shake .35s ease';
+    setTimeout(()=>box.style.animation='',400);
+  }
 }
 
 function doLogout(){
   if(SESION) registrarHistorial(SESION.username,'logout','🚪 Cierre de sesión','logout');
-  SESION=null;
+  SESION=null; loginUsuarioSel=null; pinActual='';
   document.getElementById('app-wrapper').style.display='none';
   document.getElementById('login-screen').style.display='flex';
-  document.getElementById('login-user').value='';
-  document.getElementById('login-pass').value='';
+  // Resetear a paso 1
+  document.getElementById('step-pin').classList.remove('active');
+  document.getElementById('step-usuario').classList.add('active');
+  actualizarPinDots();
+  renderUserGrid();
+  // BUG FIX 2: Forzar pestaña a Servicios FIE al cerrar sesión
+  // para que al reingresar no quede en una pestaña restringida
+  const primerTab = document.querySelector('#mainTabs .nav-link');
+  if(primerTab){
+    bootstrap.Tab.getOrCreateInstance(primerTab).show();
+  }
 }
 
 function togglePassVis(){
-  const inp=document.getElementById('login-pass'),ico=document.getElementById('pass-eye');
-  if(inp.type==='password'){inp.type='text';ico.className='bi bi-eye-slash';}
-  else{inp.type='password';ico.className='bi bi-eye';}
+  // Mantenido por compatibilidad
 }
 
 function aplicarSesion(){
@@ -2777,18 +2910,37 @@ function aplicarSesion(){
   document.querySelectorAll('.admin-only').forEach(el=>{
     el.style.display=SESION.rol==='admin'?'':'none';
   });
+  // BUG FIX 2: Si el usuario no es admin y la pestaña activa es la de admin,
+  // redirigir a la primera pestaña visible
+  const tabActivo = document.querySelector('#mainTabs .nav-link.active');
+  if(tabActivo && tabActivo.getAttribute('data-bs-target')==='#t-admin' && SESION.rol!=='admin'){
+    const primerTab = document.querySelector('#mainTabs .nav-link');
+    if(primerTab) bootstrap.Tab.getOrCreateInstance(primerTab).show();
+  }
   // Si el usuario tiene comandancia asignada, preseleccionarla
   if(SESION.comandancia){
     const sel=document.getElementById('sel-com');
     if(sel){sel.value=SESION.comandancia;DB.ss('com',SESION.comandancia);}
   }
-  // Historial: precargar filtro de usuario si no es admin
+  // Historial: solo admin ve todos los usuarios
   const hfu=document.getElementById('hist-filtro-user');
-  if(hfu&&SESION.rol!=='admin'){
-    hfu.value=SESION.username;
-    hfu.disabled=true;
+  if(hfu){
+    hfu.disabled = SESION.rol!=='admin';
+    if(SESION.rol!=='admin') hfu.value=SESION.username;
+    else hfu.value='__all__';
   }
 }
+
+// BUG FIX 1: Capturar teclado físico para el PIN cuando el login está visible
+document.addEventListener('keydown', function(e){
+  // Solo actuar si el login-screen está visible y estamos en el paso del PIN
+  const loginVisible = document.getElementById('login-screen').style.display !== 'none';
+  const pinActivo = document.getElementById('step-pin').classList.contains('active');
+  if(!loginVisible || !pinActivo) return;
+  if(e.key >= '0' && e.key <= '9') pinTecla(e.key);
+  else if(e.key === 'Backspace') pinBorrar();
+  else if(e.key === 'Escape') volverPaso1();
+});
 
 // ════════════════════════════════════════
 //  HISTORIAL
@@ -2864,6 +3016,7 @@ function crearUsuario(e){
   const r=document.getElementById('nu-rol').value;
   const c=document.getElementById('nu-com').value;
   if(!u||!n||!p){alert('Completa los campos obligatorios.');return;}
+  if(!/^[0-9]{4}$/.test(p)){alert('La contraseña debe ser exactamente 4 dígitos numéricos.');return;}
   const users=DB.get('usuarios');
   if(users.find(x=>x.username.toLowerCase()===u)){
     alert('Ese nombre de usuario ya existe.');return;
@@ -2919,7 +3072,7 @@ function guardarEdicionUsuario(){
   const u=users[idx];
   u.nombre=document.getElementById('eu-nombre').value.trim()||u.nombre;
   const np=document.getElementById('eu-pass').value.trim();
-  if(np) u.pass=btoa(np);
+  if(np){if(!/^[0-9]{4}$/.test(np)){alert('El PIN debe ser 4 dígitos numéricos.');return;}u.pass=btoa(np);}
   u.rol=document.getElementById('eu-rol').value;
   u.comandancia=document.getElementById('eu-com').value;
   DB.set('usuarios',users);
@@ -2971,8 +3124,28 @@ function showAlMsg(id,msgId,msg){const e=document.getElementById(id),m=document.
 function init(){
   updComs();renderP();renderU();renderFIE();renderFIC();renderProf();
   aplicarModo();renderUsuarios();renderHistorial();
+  renderUserGrid();
 }
+
+// Auto-refresh de vista al cambiar de pestaña
+document.addEventListener('shown.bs.tab', function(e){
+  const target = e.target.getAttribute('data-bs-target');
+  if(target==='#t-fie') renderFIE();
+  else if(target==='#t-fic') renderFIC();
+  else if(target==='#t-prof') renderProf();
+  else if(target==='#t-stats'){updateStats();buildFiltroBar();}
+  else if(target==='#t-config'){renderP();renderU();}
+  else if(target==='#t-concentrador') renderEstaciones();
+  else if(target==='#t-admin') renderUsuarios();
+  else if(target==='#t-historial') renderHistorial();
+  else if(target==='#t-ajustes'){
+    setN('sys-p',DB.get('personal').length);setN('sys-u',DB.get('unidades').length);
+    setN('sys-fie',DB.get('fie').length);setN('sys-c',DB.get('fic').length+DB.get('prof').length);
+  }
+});
+
 initUsuarios();
+renderUserGrid(); // Poblar el grid de usuarios al cargar la página
 // No llamamos init() aquí — se llama tras login exitoso
 </script>
 </div><!-- /app-wrapper -->
