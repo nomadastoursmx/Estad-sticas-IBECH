@@ -272,7 +272,7 @@ textarea.form-control{resize:vertical;}
 .role-usuario{background:rgba(21,101,192,.2);color:#90CAF9;border:1px solid rgba(21,101,192,.25);}
 
 /* ══ HISTORIAL ══ */
-.hist-row{display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid var(--borde);font-size:.78rem;align-items:flex-start;}
+.hist-row{display:grid;grid-template-columns:140px 160px 1fr 90px;gap:10px;padding:7px 10px;border-bottom:1px solid var(--borde);font-size:.78rem;align-items:center;}
 .hist-row:last-child{border-bottom:none;}
 .hist-row:hover{background:rgba(255,255,255,.02);}
 .hist-time{color:var(--texto3);white-space:nowrap;font-family:'Barlow Condensed',sans-serif;flex-shrink:0;min-width:130px;}
@@ -293,6 +293,14 @@ textarea.form-control{resize:vertical;}
 .mes-btn{background:var(--bg3);border:1px solid var(--borde2);border-radius:20px;padding:3px 12px;font-size:.75rem;font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--texto2);cursor:pointer;transition:all .15s;}
 .mes-btn:hover{color:#fff;border-color:var(--texto2);}
 .mes-btn.active{background:rgba(211,47,47,.2);border-color:var(--rojo-l);color:var(--rojo-l);}
+
+/* ══ RESTRICCIONES USUARIO ══ */
+.admin-only-card{display:none;}
+.admin-only-card.visible{display:block;}
+/* El card-head del FIE form en modo usuario muestra un aviso */
+.admin-form-hdr.usuario-mode{cursor:default;pointer-events:none;opacity:.5;}
+.readonly-notice{background:rgba(245,127,23,.1);border:1px solid rgba(245,127,23,.3);border-radius:var(--radio-sm);padding:7px 12px;font-size:.78rem;color:#FFB74D;display:none;margin-bottom:10px;}
+.readonly-notice.visible{display:flex;align-items:center;gap:8px;}
 
 /* ══ CONCENTRADOR ══ */
 .mode-banner{display:flex;align-items:center;gap:10px;padding:7px 16px;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
@@ -421,11 +429,11 @@ textarea.form-control{resize:vertical;}
       <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-fic"><i class="bi bi-mortarboard"></i>Cursos Impartidos</button></li>
       <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-prof"><i class="bi bi-award"></i>Profesionalización</button></li>
       <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-stats"><i class="bi bi-bar-chart-line"></i>Estadísticas</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-config"><i class="bi bi-people-fill"></i>Personal y Unidades</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-concentrador"><i class="bi bi-diagram-3-fill"></i>Concentrador</button></li>
+      <li class="nav-item admin-only" style="display:none;"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-config"><i class="bi bi-people-fill"></i>Personal y Unidades</button></li>
+      <li class="nav-item admin-only" style="display:none;"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-concentrador"><i class="bi bi-diagram-3-fill"></i>Concentrador</button></li>
       <li class="nav-item admin-only" style="display:none;"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-admin"><i class="bi bi-shield-lock-fill"></i>Administración</button></li>
       <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-historial"><i class="bi bi-clock-history"></i>Historial</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-ajustes"><i class="bi bi-sliders"></i>Configuración</button></li>
+      <li class="nav-item admin-only" style="display:none;"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t-ajustes"><i class="bi bi-sliders"></i>Configuración</button></li>
     </ul>
   </div>
   <div id="mode-banner" class="mode-banner modo-estacion no-print">
@@ -451,6 +459,7 @@ textarea.form-control{resize:vertical;}
     <h2><span class="icon-hdr"><i class="bi bi-clipboard2-pulse"></i></span>Registro de Servicio · FIE</h2>
     <div class="com-badge"><i class="bi bi-geo-alt-fill"></i><span id="fie-com">No seleccionada</span></div>
   </div>
+  <div class="readonly-notice" id="notice-fie"><i class="bi bi-lock-fill"></i>Puedes registrar servicios, pero solo los administradores pueden editar o eliminar registros existentes.</div>
 
   <!-- Formulario FIE -->
   <div class="card-dark mb-4">
@@ -760,6 +769,7 @@ textarea.form-control{resize:vertical;}
     <h2><span class="icon-hdr"><i class="bi bi-mortarboard"></i></span>Cursos, Talleres y/o Capacitaciones · FIC</h2>
     <div class="com-badge"><i class="bi bi-geo-alt-fill"></i><span id="fic-com">No seleccionada</span></div>
   </div>
+  <div class="readonly-notice" id="notice-fic"><i class="bi bi-lock-fill"></i>Puedes registrar cursos, pero solo los administradores pueden eliminar registros existentes.</div>
   <div class="card-dark mb-4">
     <div class="card-head"><span class="title"><i class="bi bi-plus-circle-fill"></i>Nuevo Registro FIC</span></div>
     <div class="card-body">
@@ -828,6 +838,7 @@ textarea.form-control{resize:vertical;}
     <h2><span class="icon-hdr"><i class="bi bi-award"></i></span>Cursos, Certificaciones y/o Talleres Recibidos</h2>
     <div class="com-badge"><i class="bi bi-geo-alt-fill"></i><span id="prof-com">No seleccionada</span></div>
   </div>
+  <div class="readonly-notice" id="notice-prof"><i class="bi bi-lock-fill"></i>Puedes registrar capacitaciones, pero solo los administradores pueden eliminar registros existentes.</div>
   <div class="card-dark mb-4">
     <div class="card-head"><span class="title"><i class="bi bi-plus-circle-fill"></i>Nuevo Registro de Capacitación Recibida</span></div>
     <div class="card-body">
@@ -1452,10 +1463,17 @@ textarea.form-control{resize:vertical;}
           <option value="admin">Administración</option>
         </select>
         <button class="btn-outline px-2 py-0" style="font-size:.78rem;" onclick="exportarHistorial()"><i class="bi bi-download me-1"></i>CSV</button>
-        <button class="btn-ghost px-2 py-0" style="font-size:.78rem;" onclick="if(confirm('¿Limpiar historial completo?')){DB.set('historial',[]);renderHistorial();}"><i class="bi bi-trash me-1"></i>Limpiar</button>
+        <button id="btn-limpiar-hist" class="btn-ghost px-2 py-0" style="font-size:.78rem;display:none;" onclick="if(confirm('¿Limpiar historial completo?')){DB.set('historial',[]);renderHistorial();}"><i class="bi bi-trash me-1"></i>Limpiar</button>
       </div>
     </div>
-    <div id="hist-container" style="max-height:600px;overflow-y:auto;">
+    <!-- Cabecera de columnas -->
+    <div style="display:grid;grid-template-columns:140px 160px 1fr 90px;gap:10px;padding:6px 10px;background:var(--bg3);border-bottom:1px solid var(--borde);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--texto3);">
+      <div>Fecha / Hora</div>
+      <div>Usuario</div>
+      <div>Acción</div>
+      <div>Tipo</div>
+    </div>
+    <div id="hist-container" style="max-height:560px;overflow-y:auto;">
       <div class="text-center py-5" style="color:var(--texto3);">
         <i class="bi bi-clock-history" style="font-size:1.5rem;display:block;margin-bottom:6px;"></i>Sin movimientos registrados.
       </div>
@@ -1478,7 +1496,7 @@ textarea.form-control{resize:vertical;}
       <div class="modal-body" id="m-body"></div>
       <div class="modal-footer">
         <button type="button" class="btn-ghost px-3 py-1" data-bs-dismiss="modal"><i class="bi bi-x me-1"></i>Cerrar</button>
-        <button type="button" class="btn-outline px-3 py-1" id="btn-m-edit" onclick="activarEdicion()"><i class="bi bi-pencil me-1"></i>Editar</button>
+        <button type="button" class="btn-outline px-3 py-1 admin-only-btn" id="btn-m-edit" onclick="activarEdicion()"><i class="bi bi-pencil me-1"></i>Editar</button>
         <button type="button" class="btn-rojo d-none" id="btn-m-save" onclick="guardarEdicion()"><i class="bi bi-save-fill"></i>Guardar Cambios</button>
       </div>
     </div>
@@ -1766,7 +1784,7 @@ function renderFIE(datos){
       <td><span class="badge-verde">${r.totalPob||0}</span></td>
       <td class="d-flex gap-1">
         <button class="btn-icon verde" onclick="verFIE(${r.id})" title="Ver detalle"><i class="bi bi-eye"></i></button>
-        <button class="btn-icon" onclick="delFIE(${r.id})" title="Eliminar"><i class="bi bi-trash"></i></button>
+        ${esAdmin()?`<button class="btn-icon" onclick="delFIE(${r.id})" title="Eliminar"><i class="bi bi-trash"></i></button>`:''}
       </td>
     </tr>`;
   }).join('');
@@ -1925,7 +1943,7 @@ function renderFIC(){
     <td>${r.instructor||'—'}</td><td>${r.mujeres||0}</td><td>${r.hombres||0}</td><td>${r.ninas||0}</td>
     <td>${r.ninos||0}</td><td>${r.discap||0}</td><td>${r.lgbt||0}</td>
     <td><span class="badge-verde">${r.total||0}</span></td>
-    <td><button class="btn-icon" onclick="delFIC(${r.id})"><i class="bi bi-trash"></i></button></td>
+    <td>${esAdmin()?`<button class="btn-icon" onclick="delFIC(${r.id})"><i class="bi bi-trash"></i></button>`:''}</td>
   </tr>`).join('');
 }
 function delFIC(id){
@@ -1963,7 +1981,7 @@ function renderProf(){
     <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.participantes||''}">${r.participantes||'—'}</td>
     <td>${r.mujeres||0}</td><td>${r.hombres||0}</td>
     <td><span class="badge-verde">${r.total||0}</span></td>
-    <td><button class="btn-icon" onclick="delProf(${r.id})"><i class="bi bi-trash"></i></button></td>
+    <td>${esAdmin()?`<button class="btn-icon" onclick="delProf(${r.id})"><i class="bi bi-trash"></i></button>`:''}</td>
   </tr>`).join('');
 }
 function delProf(id){
@@ -1994,6 +2012,9 @@ function noData(cId,nId,show){
 // ════════════════════════
 //  UPDATE STATS
 // ════════════════════════
+// Helper: ¿el usuario actual es admin?
+function esAdmin(){ return SESION && SESION.rol === 'admin'; }
+
 // Forward refs — full implementations in concentrador section below
 function getFIEFiltrado(){
   let fie=DB.get('fie');
@@ -2903,30 +2924,46 @@ function togglePassVis(){
 
 function aplicarSesion(){
   if(!SESION)return;
-  // Topbar
+  const admin = SESION.rol === 'admin';
+
+  // Topbar — nombre y rol
   const tu=document.getElementById('topbar-user');
-  if(tu) tu.textContent=SESION.nombre+' ('+(SESION.rol==='admin'?'Admin':'Usuario')+')';
-  // Mostrar/ocultar tab admin
+  if(tu) tu.textContent=SESION.nombre+' ('+(admin?'Admin':'Usuario')+')';
+
+  // ── Tabs: mostrar/ocultar según rol ──
   document.querySelectorAll('.admin-only').forEach(el=>{
-    el.style.display=SESION.rol==='admin'?'':'none';
+    el.style.display=admin?'':'none';
   });
-  // BUG FIX 2: Si el usuario no es admin y la pestaña activa es la de admin,
-  // redirigir a la primera pestaña visible
+
+  // Redirigir si la pestaña activa es restringida para usuarios
+  const TABS_SOLO_ADMIN = ['#t-admin','#t-config','#t-concentrador','#t-ajustes'];
   const tabActivo = document.querySelector('#mainTabs .nav-link.active');
-  if(tabActivo && tabActivo.getAttribute('data-bs-target')==='#t-admin' && SESION.rol!=='admin'){
-    const primerTab = document.querySelector('#mainTabs .nav-link');
+  if(tabActivo && !admin && TABS_SOLO_ADMIN.includes(tabActivo.getAttribute('data-bs-target'))){
+    const primerTab = document.querySelector('#mainTabs .nav-link:not(.admin-only .nav-link)');
     if(primerTab) bootstrap.Tab.getOrCreateInstance(primerTab).show();
   }
-  // Si el usuario tiene comandancia asignada, preseleccionarla
+
+  // ── Botón editar en modal FIE: solo admin ──
+  const btnEdit = document.getElementById('btn-m-edit');
+  if(btnEdit) btnEdit.style.display = admin ? '' : 'none';
+
+  // ── Avisos de solo lectura (solo en columna de acciones/eliminar) ──
+  ['notice-fie','notice-fic','notice-prof'].forEach(id=>{
+    const n=document.getElementById(id);
+    if(n) n.classList.toggle('visible', !admin);
+  });
+
+  // ── Comandancia asignada ──
   if(SESION.comandancia){
     const sel=document.getElementById('sel-com');
     if(sel){sel.value=SESION.comandancia;DB.ss('com',SESION.comandancia);}
   }
-  // Historial: solo admin ve todos los usuarios
+
+  // ── Historial: solo admin ve todos los usuarios ──
   const hfu=document.getElementById('hist-filtro-user');
   if(hfu){
-    hfu.disabled = SESION.rol!=='admin';
-    if(SESION.rol!=='admin') hfu.value=SESION.username;
+    hfu.disabled = !admin;
+    if(!admin) hfu.value=SESION.username;
     else hfu.value='__all__';
   }
 }
@@ -2958,37 +2995,64 @@ function logAccion(tipo,accion,tag){
 }
 
 function renderHistorial(){
-  const all=DB.get('historial');
-  const filtU=document.getElementById('hist-filtro-user')?.value||'__all__';
-  const filtT=document.getElementById('hist-filtro-tipo')?.value||'__all__';
-  // Si no es admin, forzar filtro propio
-  const esAdmin=SESION?.rol==='admin';
-  let arr=all;
-  if(!esAdmin) arr=arr.filter(r=>r.username===SESION?.username);
-  if(filtU!=='__all__') arr=arr.filter(r=>r.username===filtU);
-  if(filtT!=='__all__') arr=arr.filter(r=>r.tag===filtT);
+  const all = DB.get('historial');
+  const filtU = document.getElementById('hist-filtro-user')?.value || '__all__';
+  const filtT = document.getElementById('hist-filtro-tipo')?.value || '__all__';
+  const esAdminSesion = SESION?.rol === 'admin';
+
+  // Construir mapa username → nombre completo
+  const usersMap = {};
+  DB.get('usuarios').forEach(u => { usersMap[u.username] = u.nombre; });
+
+  // Botón limpiar solo para admin
+  const btnLimpiar = document.getElementById('btn-limpiar-hist');
+  if(btnLimpiar) btnLimpiar.style.display = esAdminSesion ? '' : 'none';
+
+  // Filtrar por sesión
+  let arr = all;
+  if(!esAdminSesion) arr = arr.filter(r => r.username === SESION?.username);
+  if(filtU !== '__all__') arr = arr.filter(r => r.username === filtU);
+  if(filtT !== '__all__') arr = arr.filter(r => r.tag === filtT);
 
   // Poblar selector de usuarios (solo admin)
-  const hfu=document.getElementById('hist-filtro-user');
-  if(hfu&&esAdmin){
-    const users=[...new Set(all.map(r=>r.username))].sort();
-    const cur=hfu.value;
-    hfu.innerHTML='<option value="__all__">Todos los usuarios</option>'+users.map(u=>`<option value="${u}" ${cur===u?'selected':''}>${u}</option>`).join('');
+  const hfu = document.getElementById('hist-filtro-user');
+  if(hfu && esAdminSesion){
+    const users = [...new Set(all.map(r => r.username))].sort();
+    const cur = hfu.value;
+    hfu.innerHTML = '<option value="__all__">Todos los usuarios</option>' +
+      users.map(u => `<option value="${u}" ${cur===u?'selected':''}>${usersMap[u]||u}</option>`).join('');
   }
 
-  const cont=document.getElementById('hist-container');
-  const cnt=document.getElementById('hist-count');
-  if(!arr.length){
-    cont.innerHTML='<div class="text-center py-5" style="color:var(--texto3);"><i class="bi bi-clock-history" style="font-size:1.5rem;display:block;margin-bottom:6px;"></i>Sin movimientos para este filtro.</div>';
-    if(cnt) cnt.textContent='';return;
+  const cont = document.getElementById('hist-container');
+  const cnt  = document.getElementById('hist-count');
+
+  // Sin sesión activa aún — estado neutral
+  if(!SESION){
+    if(cont) cont.innerHTML = '<div class="text-center py-5" style="color:var(--texto3);"><i class="bi bi-clock-history" style="font-size:1.5rem;display:block;margin-bottom:6px;"></i>Inicia sesión para ver el historial.</div>';
+    if(cnt) cnt.textContent = '';
+    return;
   }
-  cont.innerHTML=arr.map(r=>`<div class="hist-row">
-    <div class="hist-time">${r.ts||'—'}</div>
-    <div class="hist-user"><i class="bi bi-person me-1"></i>${r.username}</div>
-    <div class="hist-action">${r.accion}</div>
-    <span class="hist-tag ${r.tag||'save'}">${tagLabel(r.tag)}</span>
-  </div>`).join('');
-  if(cnt) cnt.textContent=`${arr.length} registro(s) mostrado(s) de ${all.length} total(es)`;
+
+  if(!arr.length){
+    if(cont) cont.innerHTML = '<div class="text-center py-5" style="color:var(--texto3);"><i class="bi bi-clock-history" style="font-size:1.5rem;display:block;margin-bottom:6px;"></i>Sin movimientos para este filtro.</div>';
+    if(cnt) cnt.textContent = '';
+    return;
+  }
+
+  cont.innerHTML = arr.map(r => {
+    const nombreCompleto = usersMap[r.username] || r.username || '—';
+    return `<div class="hist-row">
+      <div class="hist-time">${r.ts || '—'}</div>
+      <div class="hist-user" style="display:flex;flex-direction:column;gap:1px;">
+        <span style="color:var(--azul-l);font-weight:600;font-size:.78rem;">${nombreCompleto}</span>
+        <span style="color:var(--texto3);font-size:.68rem;">@${r.username || '—'}</span>
+      </div>
+      <div class="hist-action">${r.accion || '—'}</div>
+      <span class="hist-tag ${r.tag || 'save'}">${tagLabel(r.tag)}</span>
+    </div>`;
+  }).join('');
+
+  if(cnt) cnt.textContent = `${arr.length} registro(s) mostrado(s) de ${all.length} total(es)`;
 }
 
 function tagLabel(t){
