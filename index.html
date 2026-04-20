@@ -1504,6 +1504,7 @@ textarea.form-control{resize:vertical;}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 // ════════════════════════
 //  DB
@@ -3229,10 +3230,23 @@ document.addEventListener('shown.bs.tab', function(e){
   }
 });
 
-initUsuarios();
-renderUserGrid(); // Poblar el grid de usuarios al cargar la página
+// Esperar a que el DOM esté completamente listo antes de ejecutar
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', arrancar);
+} else {
+  arrancar();
+}
+function arrancar(){
+  initUsuarios();
+  renderUserGrid();
+  // Asegurar que login esté visible y app oculto
+  const ls=document.getElementById('login-screen');
+  const aw=document.getElementById('app-wrapper');
+  if(ls) ls.style.display='flex';
+  if(aw) aw.style.display='none';
+}
 // No llamamos init() aquí — se llama tras login exitoso
-</script>
 </div><!-- /app-wrapper -->
+</script>
 </body>
 </html>
