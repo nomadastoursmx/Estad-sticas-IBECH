@@ -2801,10 +2801,31 @@ let loginUsuarioSel = null;
 function initUsuarios(){
   let users = DB.get('usuarios');
   if(!users.length){
-    // Usuario admin por defecto — PIN: 1234
+    // Primera vez — crear admin con PIN 1234
     users = [{id:'admin_default',username:'admin',nombre:'Administrador IBECH',
-      pass:btoa('2455'),rol:'admin',comandancia:'',activo:true}];
+      pass:btoa('1234'),rol:'admin',comandancia:'',activo:true}];
     DB.set('usuarios',users);
+  } else {
+    // Migración: si algún usuario tiene contraseña que no es PIN de 4 dígitos
+    // (contraseña antigua de texto como 'ibech2026'), resetearla a 1234
+    let changed = false;
+    users = users.map(u => {
+      try {
+        const decoded = atob(u.pass);
+        if(!/^[0-9]{4}$/.test(decoded)){
+          // Contraseña antigua — resetear a 1234
+          console.warn(`Usuario "${u.username}" tenía contraseña antigua. Reseteando a PIN 1234.`);
+          u.pass = btoa('1234');
+          changed = true;
+        }
+      } catch(e){
+        // Si atob falla, también resetear
+        u.pass = btoa('1234');
+        changed = true;
+      }
+      return u;
+    });
+    if(changed) DB.set('usuarios', users);
   }
 }
 
