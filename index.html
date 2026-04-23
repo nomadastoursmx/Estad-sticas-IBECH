@@ -1705,7 +1705,8 @@ document.querySelectorAll('.fic-f').forEach(el=>el.addEventListener('input',()=>
 //  FIE: CÁLCULO TOTAL
 // ════════════════════════
 const FIE_COLS=['casa_hab','comercio','pastizales','forestales','vehiculares','explosiones','gas','sust_pel','mezclas',
-  'inundaciones','cables','espectaculares','arboles','abejas','fauna_nociva',
+  'relleno_sanitario','derecho_de_via','via_publica',
+  'inundaciones','cables','retiro_de_estructura','espectaculares','arboles','abejas','fauna_nociva','animales_domesticos',
   'prehosp_acc','derrame','extricacion','derrumbes',
   'concentracion','prevencion','prop_agua',
   'byr_prehosp','byr_vida','byr_cuerpos','byr_atrapados',
@@ -1839,10 +1840,11 @@ function renderModal(edit){
     ['Fuego','sec'],
     ['Casa Habitación',r.casa_hab||0],['Comercio/Industria',r.comercio||0],['Pastizales',r.pastizales||0],
     ['Forestales',r.forestales||0],['Vehículos',r.vehiculares||0],['Explosiones',r.explosiones||0],
-    ['Fugas de Gas',r.gas||0],['Sust. Peligrosas',r.sust_pel||0],['Mezclas Inflamables',r.mezclas||0],
+    ['Fugas de Gas',r.gas||0],['Sust. Peligrosas',r.sust_pel||0],['Mezclas Inflamables',r.mezclas||0],['Relleno Sanitario',r.relleno_sanitario||0],['Derecho de Vía',r.derecho_de_via||0],['Vía Pública',r.via_publica||0],
+    ['Relleno Sanitario',r.relleno_sanitario||0],['Derecho de Vía',r.derecho_de_via||0],['Vía Pública',r.via_publica||0],
     ['Agua y Aire','sec'],
-    ['Inundaciones',r.inundaciones||0],['Cables Caídos',r.cables||0],['Espectaculares',r.espectaculares||0],['Árboles',r.arboles||0],
-    ['Fauna','sec'],['Abejas',r.abejas||0],['Fauna Nociva',r.fauna_nociva||0],
+    ['Inundaciones',r.inundaciones||0],['Cables Caídos',r.cables||0],['Retiro de Estructura',r.retiro_de_estructura||0],['Espectaculares Caídos',r.espectaculares||0],['Árboles',r.arboles||0],
+    ['Fauna','sec'],['Abejas',r.abejas||0],['Fauna Nociva',r.fauna_nociva||0],['Animales Domésticos',r.animales_domesticos||0],
     ['Accidentes','sec'],
     ['Atención Prehospitalaria',r.prehosp_acc||0],['Derrame/Fuga',r.derrame||0],['Extricación',r.extricacion||0],['Derrumbes',r.derrumbes||0],
     ['Socioorganizativo','sec'],
@@ -1860,9 +1862,9 @@ function renderModal(edit){
   const CAMPO_MAP={'Día':'dia','Mes':'mes','No. FIE':'num','Hora':'hora','Dirección':'dir','Descripción':'desc','Observaciones':'obs',
     'Personal Asignado':'personal','Unidades/Equipos':'unidades','Paciente':'ph_paciente','Lugar':'ph_lugar','Obs PH':'ph_obs',
     'Casa Habitación':'casa_hab','Comercio/Industria':'comercio','Pastizales':'pastizales','Forestales':'forestales',
-    'Vehículos':'vehiculares','Explosiones':'explosiones','Fugas de Gas':'gas','Sust. Peligrosas':'sust_pel','Mezclas Inflamables':'mezclas',
-    'Inundaciones':'inundaciones','Cables Caídos':'cables','Espectaculares':'espectaculares','Árboles':'arboles',
-    'Abejas':'abejas','Fauna Nociva':'fauna_nociva',
+    'Vehículos':'vehiculares','Explosiones':'explosiones','Fugas de Gas':'gas','Sust. Peligrosas':'sust_pel','Mezclas Inflamables':'mezclas','Relleno Sanitario':'relleno_sanitario','Derecho de Vía':'derecho_de_via','Vía Pública':'via_publica',
+    'Inundaciones':'inundaciones','Cables Caídos':'cables','Retiro de Estructura':'retiro_de_estructura','Espectaculares Caídos':'espectaculares','Árboles':'arboles',
+    'Abejas':'abejas','Fauna Nociva':'fauna_nociva','Animales Domésticos':'animales_domesticos',
     'Atención Prehospitalaria':'prehosp_acc','Derrame/Fuga':'derrame','Extricación':'extricacion','Derrumbes':'derrumbes',
     'Concentración':'concentracion','Prevención':'prevencion','Agua':'prop_agua',
     'PH BYR':'byr_prehosp','Con Vida':'byr_vida','Cuerpos':'byr_cuerpos','Atrapados':'byr_atrapados',
@@ -2046,9 +2048,9 @@ function updateStats(){
   const phCount=fie.filter(r=>(r.ph_tipos||[]).length>0).length;
 
   const catData={
-    fuego: fie.reduce((s,r)=>s+(r.casa_hab||0)+(r.comercio||0)+(r.pastizales||0)+(r.forestales||0)+(r.vehiculares||0)+(r.explosiones||0)+(r.gas||0)+(r.sust_pel||0)+(r.mezclas||0),0),
-    agua:  fie.reduce((s,r)=>s+(r.inundaciones||0)+(r.cables||0)+(r.espectaculares||0)+(r.arboles||0),0),
-    fauna: fie.reduce((s,r)=>s+(r.abejas||0)+(r.fauna_nociva||0),0),
+    fuego: fie.reduce((s,r)=>s+(r.casa_hab||0)+(r.comercio||0)+(r.pastizales||0)+(r.forestales||0)+(r.vehiculares||0)+(r.explosiones||0)+(r.gas||0)+(r.sust_pel||0)+(r.mezclas||0)+(r.relleno_sanitario||0)+(r.derecho_de_via||0)+(r.via_publica||0),0),
+    agua:  fie.reduce((s,r)=>s+(r.inundaciones||0)+(r.cables||0)+(r.retiro_de_estructura||0)+(r.espectaculares||0)+(r.arboles||0),0),
+    fauna: fie.reduce((s,r)=>s+(r.abejas||0)+(r.fauna_nociva||0)+(r.animales_domesticos||0),0),
     acc:   fie.reduce((s,r)=>s+(r.prehosp_acc||0)+(r.derrame||0)+(r.extricacion||0)+(r.derrumbes||0),0),
     socio: fie.reduce((s,r)=>s+(r.concentracion||0)+(r.prevencion||0)+(r.prop_agua||0),0),
     byr:   fie.reduce((s,r)=>s+(r.byr_prehosp||0)+(r.byr_vida||0)+(r.byr_cuerpos||0)+(r.byr_atrapados||0),0),
@@ -2157,12 +2159,22 @@ function updateStats(){
     ['Fugas de Gas','fuego',fie.reduce((s,r)=>s+(r.gas||0),0)],
     ['Sust. Peligrosas','fuego',fie.reduce((s,r)=>s+(r.sust_pel||0),0)],
     ['Mezclas Inflamables','fuego',fie.reduce((s,r)=>s+(r.mezclas||0),0)],
+    ['Relleno Sanitario','fuego',fie.reduce((s,r)=>s+(r.relleno_sanitario||0),0)],
+    ['Derecho de Vía','fuego',fie.reduce((s,r)=>s+(r.derecho_de_via||0),0)],
+    ['Vía Pública','fuego',fie.reduce((s,r)=>s+(r.via_publica||0),0)],
+    ['Relleno Sanitario','fuego',fie.reduce((s,r)=>s+(r.relleno_sanitario||0),0)],
+    ['Derecho de Vía','fuego',fie.reduce((s,r)=>s+(r.derecho_de_via||0),0)],
+    ['Vía Pública','fuego',fie.reduce((s,r)=>s+(r.via_publica||0),0)],
     ['Inundaciones','agua',fie.reduce((s,r)=>s+(r.inundaciones||0),0)],
     ['Cables Caídos','agua',fie.reduce((s,r)=>s+(r.cables||0),0)],
+    ['Retiro de Estructura','agua',fie.reduce((s,r)=>s+(r.retiro_de_estructura||0),0)],
+    ['Retiro de Estructura','agua',fie.reduce((s,r)=>s+(r.retiro_de_estructura||0),0)],
     ['Espectaculares Caídos','agua',fie.reduce((s,r)=>s+(r.espectaculares||0),0)],
     ['Seccionar Árboles','agua',fie.reduce((s,r)=>s+(r.arboles||0),0)],
     ['Retiro de Abejas','fauna',fie.reduce((s,r)=>s+(r.abejas||0),0)],
     ['Captura Fauna Nociva','fauna',fie.reduce((s,r)=>s+(r.fauna_nociva||0),0)],
+    ['Rescate Animales Domésticos','fauna',fie.reduce((s,r)=>s+(r.animales_domesticos||0),0)],
+    ['Rescate Animales Domésticos','fauna',fie.reduce((s,r)=>s+(r.animales_domesticos||0),0)],
     ['Atención Prehospitalaria','acc',fie.reduce((s,r)=>s+(r.prehosp_acc||0),0)],
     ['Derrame/Fuga Mat. Peligroso','acc',fie.reduce((s,r)=>s+(r.derrame||0),0)],
     ['Extricación Vehicular','acc',fie.reduce((s,r)=>s+(r.extricacion||0),0)],
@@ -2195,9 +2207,9 @@ function updateStats(){
   const resMap={};MESES.forEach(m=>resMap[m]={fuego:0,agua:0,fauna:0,acc:0,socio:0,byr:0,ph:0,falsa:0,pob:0,tot:0});
   fie.forEach(r=>{
     const m=r.mes;if(!resMap[m])return;
-    resMap[m].fuego+=(r.casa_hab||0)+(r.comercio||0)+(r.pastizales||0)+(r.forestales||0)+(r.vehiculares||0)+(r.explosiones||0)+(r.gas||0)+(r.sust_pel||0)+(r.mezclas||0);
-    resMap[m].agua+=(r.inundaciones||0)+(r.cables||0)+(r.espectaculares||0)+(r.arboles||0);
-    resMap[m].fauna+=(r.abejas||0)+(r.fauna_nociva||0);
+    resMap[m].fuego+=(r.casa_hab||0)+(r.comercio||0)+(r.pastizales||0)+(r.forestales||0)+(r.vehiculares||0)+(r.explosiones||0)+(r.gas||0)+(r.sust_pel||0)+(r.mezclas||0)+(r.relleno_sanitario||0)+(r.derecho_de_via||0)+(r.via_publica||0);
+    resMap[m].agua+=(r.inundaciones||0)+(r.cables||0)+(r.retiro_de_estructura||0)+(r.espectaculares||0)+(r.arboles||0);
+    resMap[m].fauna+=(r.abejas||0)+(r.fauna_nociva||0)+(r.animales_domesticos||0);
     resMap[m].acc+=(r.prehosp_acc||0)+(r.derrame||0)+(r.extricacion||0)+(r.derrumbes||0);
     resMap[m].socio+=(r.concentracion||0)+(r.prevencion||0)+(r.prop_agua||0);
     resMap[m].byr+=(r.byr_prehosp||0)+(r.byr_vida||0)+(r.byr_cuerpos||0)+(r.byr_atrapados||0);
