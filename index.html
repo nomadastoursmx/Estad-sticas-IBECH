@@ -2174,7 +2174,6 @@ function updateStats(){
     ['Retiro de Abejas','fauna',fie.reduce((s,r)=>s+(r.abejas||0),0)],
     ['Captura Fauna Nociva','fauna',fie.reduce((s,r)=>s+(r.fauna_nociva||0),0)],
     ['Rescate Animales Domésticos','fauna',fie.reduce((s,r)=>s+(r.animales_domesticos||0),0)],
-    ['Rescate Animales Domésticos','fauna',fie.reduce((s,r)=>s+(r.animales_domesticos||0),0)],
     ['Atención Prehospitalaria','acc',fie.reduce((s,r)=>s+(r.prehosp_acc||0),0)],
     ['Derrame/Fuga Mat. Peligroso','acc',fie.reduce((s,r)=>s+(r.derrame||0),0)],
     ['Extricación Vehicular','acc',fie.reduce((s,r)=>s+(r.extricacion||0),0)],
@@ -2469,6 +2468,7 @@ function aplicarModo() {
     btnE.style.background  = 'var(--bg3)';
     renderEstaciones();
     buildFiltroBar();
+    actualizarFiltroComVisibilidad();
   } else {
     banner.className = 'mode-banner modo-estacion no-print';
     const com = DB.gs('com') || 'Sin comandancia seleccionada';
@@ -2476,7 +2476,8 @@ function aplicarModo() {
     badgeC.textContent = com;
     panelC.style.display = 'none';
     panelG.style.display = 'block';
-    filtroW.style.display = 'none';
+    // En modo estación, evaluar si mostrar filtro (admin con datos multi-comandancia)
+    actualizarFiltroComVisibilidad();
     btnE.style.borderColor = 'var(--azul-l)';
     btnE.style.background  = 'rgba(21,101,192,.1)';
     btnC.style.borderColor = 'var(--borde2)';
@@ -2489,6 +2490,19 @@ function aplicarModo() {
 // ════════════════════════════════════════
 //  FILTRO COMANDANCIA EN STATS
 // ════════════════════════════════════════
+// Mostrar filtro de comandancia si hay datos de más de 1 comandancia
+function actualizarFiltroComVisibilidad(){
+  const filtroW = document.getElementById('filtro-com-wrap');
+  if(!filtroW) return;
+  const admin = SESION?.rol === 'admin';
+  const comandancias = [...new Set(DB.get('fie').map(r=>r.comandancia).filter(Boolean))];
+  // Mostrar si: es admin Y hay al menos 1 comandancia registrada en los datos
+  // O si hay más de 1 comandancia (cualquier usuario puede ver el filtro)
+  const mostrar = admin && comandancias.length >= 1;
+  filtroW.style.display = mostrar ? 'block' : 'none';
+  if(mostrar) buildFiltroBar();
+}
+
 function setFiltroComandancia(com, btn) {
   FILTRO_COM = com;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -2506,14 +2520,21 @@ function setFiltroComandancia(com, btn) {
 function buildFiltroBar() {
   const bar = document.getElementById('filter-com-bar');
   if (!bar) return;
-  const comandancias = [...new Set(DB.get('fie').map(r => r.comandancia).filter(Boolean))].sort();
-  // Rebuild
-  bar.innerHTML = `<button class="filter-btn all ${FILTRO_COM==='__all__'?'active':''}" data-com="__all__" onclick="setFiltroComandancia('__all__',this)">🏛 Todas (${DB.get('fie').length})</button>`;
+  const todasFIE = DB.get('fie');
+  const comandancias = [...new Set(todasFIE.map(r => r.comandancia).filter(Boolean))].sort();
+  bar.innerHTML = `<button class="filter-btn all ${FILTRO_COM==='__all__'?'active':''}" data-com="__all__" onclick="setFiltroComandancia('__all__',this)">🏛 Todas (${todasFIE.length})</button>`;
   comandancias.forEach(com => {
-    const cnt = DB.get('fie').filter(r => r.comandancia === com).length;
+    const cnt = todasFIE.filter(r => r.comandancia === com).length;
     const active = FILTRO_COM === com ? 'active' : '';
     bar.innerHTML += `<button class="filter-btn ${active}" data-com="${com}" onclick="setFiltroComandancia('${com.replace(/'/g,"\\'")}',this)">📍 ${com} (${cnt})</button>`;
   });
+  const info = document.getElementById('filtro-com-info');
+  if(info){
+    const fie = getFIEFiltrado();
+    info.textContent = FILTRO_COM==='__all__'
+      ? `Mostrando ${fie.length} registro(s) de todas las comandancias.`
+      : `Mostrando ${fie.length} registro(s) de: ${FILTRO_COM}`;
+  }
 }
 
 // ════════════════════════════════════════
@@ -2990,6 +3011,12 @@ function aplicarSesion(){
     if(n) n.classList.toggle('visible', !admin);
   });
 
+  // ── Filtro comandancia: mostrar si admin y hay datos ──
+  actualizarFiltroComVisibilidad();
+
+  // ── Filtro comandancia: mostrar si admin y hay datos ──
+  actualizarFiltroComVisibilidad();
+
   // ── Comandancia asignada ──
   if(SESION.comandancia){
     const sel=document.getElementById('sel-com');
@@ -3244,6 +3271,9 @@ document.addEventListener('shown.bs.tab', function(e){
     setN('sys-fie',DB.get('fie').length);setN('sys-c',DB.get('fic').length+DB.get('prof').length);
   }
 });
+
+// Refresh filtro on every stats update
+function _refreshFiltroAfterUpdate(){ if(typeof actualizarFiltroComVisibilidad==='function') actualizarFiltroComVisibilidad(); }
 
 initUsuarios();
 renderUserGrid(); // Poblar el grid de usuarios al cargar la página
