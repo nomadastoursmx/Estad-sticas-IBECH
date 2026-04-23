@@ -747,8 +747,17 @@ textarea.form-control{resize:vertical;}
   <div class="card-dark">
     <div class="card-head">
       <span class="title"><i class="bi bi-table"></i>Registros Guardados</span>
-      <div class="d-flex gap-2 no-print">
-        <input type="text" class="form-control form-control-sm" id="busca-fie" placeholder="🔍 Buscar…" style="width:150px;" oninput="filtrarFIE()"/>
+      <div class="d-flex gap-2 flex-wrap no-print align-items-center">
+        <select class="form-select form-select-sm" id="fil-fie-com" style="width:160px;" onchange="filtrarFIE()">
+          <option value="">📍 Todas las estaciones</option>
+        </select>
+        <select class="form-select form-select-sm" id="fil-fie-mes" style="width:110px;" onchange="filtrarFIE()">
+          <option value="">Todos los meses</option>
+          <option>Enero</option><option>Febrero</option><option>Marzo</option><option>Abril</option>
+          <option>Mayo</option><option>Junio</option><option>Julio</option><option>Agosto</option>
+          <option>Septiembre</option><option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+        </select>
+        <input type="text" class="form-control form-control-sm" id="busca-fie" placeholder="🔍 Buscar…" style="width:130px;" oninput="filtrarFIE()"/>
         <button class="btn-outline px-2 py-0" style="font-size:.78rem;" onclick="exportarCSV()"><i class="bi bi-download me-1"></i>CSV</button>
       </div>
     </div>
@@ -824,7 +833,20 @@ textarea.form-control{resize:vertical;}
     </div>
   </div>
   <div class="card-dark">
-    <div class="card-head"><span class="title"><i class="bi bi-table"></i>Registros FIC</span></div>
+    <div class="card-head d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <span class="title"><i class="bi bi-table"></i>Registros FIC</span>
+      <div class="d-flex gap-2 flex-wrap no-print">
+        <select class="form-select form-select-sm" id="fil-fic-com" style="width:160px;" onchange="filtrarFIC()">
+          <option value="">📍 Todas las estaciones</option>
+        </select>
+        <select class="form-select form-select-sm" id="fil-fic-mes" style="width:110px;" onchange="filtrarFIC()">
+          <option value="">Todos los meses</option>
+          <option>Enero</option><option>Febrero</option><option>Marzo</option><option>Abril</option>
+          <option>Mayo</option><option>Junio</option><option>Julio</option><option>Agosto</option>
+          <option>Septiembre</option><option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+        </select>
+      </div>
+    </div>
     <div style="overflow-x:auto;">
       <table class="table tbl">
         <thead><tr><th>#</th><th>Día</th><th>Mes</th><th>No.FIC</th><th>Hrs.</th><th>Organismo</th><th>Tema</th><th>Instructor</th><th>Muj.</th><th>Hom.</th><th>Niñas</th><th>Niños</th><th>Disc.</th><th>LGBT+</th><th>Total</th><th>Acc.</th></tr></thead>
@@ -878,7 +900,20 @@ textarea.form-control{resize:vertical;}
     </div>
   </div>
   <div class="card-dark">
-    <div class="card-head"><span class="title"><i class="bi bi-table"></i>Registros de Profesionalización</span></div>
+    <div class="card-head d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <span class="title"><i class="bi bi-table"></i>Registros de Profesionalización</span>
+      <div class="d-flex gap-2 flex-wrap no-print">
+        <select class="form-select form-select-sm" id="fil-prof-com" style="width:160px;" onchange="filtrarProf()">
+          <option value="">📍 Todas las estaciones</option>
+        </select>
+        <select class="form-select form-select-sm" id="fil-prof-mes" style="width:110px;" onchange="filtrarProf()">
+          <option value="">Todos los meses</option>
+          <option>Enero</option><option>Febrero</option><option>Marzo</option><option>Abril</option>
+          <option>Mayo</option><option>Junio</option><option>Julio</option><option>Agosto</option>
+          <option>Septiembre</option><option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+        </select>
+      </div>
+    </div>
     <div style="overflow-x:auto;">
       <table class="table tbl">
         <thead><tr><th>#</th><th>Día</th><th>Mes</th><th>Hrs.</th><th>Instructor</th><th>Procedencia</th><th>Instalaciones</th><th>Tema</th><th>Participantes</th><th>Muj.</th><th>Hom.</th><th>Total</th><th>Acc.</th></tr></thead>
@@ -1789,6 +1824,7 @@ const CAT_LABEL={'fuego':'🔥','agua':'💧','fauna':'🐝','acc':'🚗','socio
 const CAT_COLOR_MAP={fuego:'#D32F2F',agua:'#1565C0',fauna:'#2E7D32',acc:'#E65100',socio:'#6A1B9A',byr:'#F57F17',ph:'#0277BD',falsa:'#558B2F'};
 
 function renderFIE(datos){
+  poblarSelectsEstacion();
   const arr=datos||DB.get('fie');
   const tb=document.getElementById('tbody-fie');
   if(!arr.length){tb.innerHTML='<tr><td colspan="12" class="text-center py-5" style="color:var(--texto3);"><i class="bi bi-inbox" style="font-size:1.5rem;display:block;margin-bottom:6px;"></i>Sin registros.</td></tr>';return;}
@@ -1818,9 +1854,49 @@ function delFIE(id){
   DB.set('fie',DB.get('fie').filter(r=>r.id!==id));renderFIE();updateStats();
 }
 function filtrarFIE(){
-  const q=document.getElementById('busca-fie').value.toLowerCase();
-  const arr=DB.get('fie').filter(r=>(r.num||'').toLowerCase().includes(q)||(r.mes||'').toLowerCase().includes(q)||(r.dir||'').toLowerCase().includes(q)||(r.personal||'').toLowerCase().includes(q));
+  const q=(document.getElementById('busca-fie')?.value||'').toLowerCase();
+  const com=document.getElementById('fil-fie-com')?.value||'';
+  const mes=document.getElementById('fil-fie-mes')?.value||'';
+  let arr=DB.get('fie');
+  if(com) arr=arr.filter(r=>r.comandancia===com);
+  if(mes) arr=arr.filter(r=>r.mes===mes);
+  if(q)   arr=arr.filter(r=>(r.num||'').toLowerCase().includes(q)||(r.mes||'').toLowerCase().includes(q)||(r.dir||'').toLowerCase().includes(q)||(r.personal||'').toLowerCase().includes(q)||(r.comandancia||'').toLowerCase().includes(q));
   renderFIE(arr);
+}
+
+function filtrarFIC(){
+  const com=document.getElementById('fil-fic-com')?.value||'';
+  const mes=document.getElementById('fil-fic-mes')?.value||'';
+  let arr=DB.get('fic');
+  if(com) arr=arr.filter(r=>r.comandancia===com);
+  if(mes) arr=arr.filter(r=>r.mes===mes);
+  renderFIC(arr);
+}
+
+function filtrarProf(){
+  const com=document.getElementById('fil-prof-com')?.value||'';
+  const mes=document.getElementById('fil-prof-mes')?.value||'';
+  let arr=DB.get('prof');
+  if(com) arr=arr.filter(r=>r.comandancia===com);
+  if(mes) arr=arr.filter(r=>r.mes===mes);
+  renderProf(arr);
+}
+
+// Poblar selects de estación en tablas FIE, FIC, Prof
+function poblarSelectsEstacion(){
+  const coms=[...new Set([
+    ...DB.get('fie').map(r=>r.comandancia),
+    ...DB.get('fic').map(r=>r.comandancia),
+    ...DB.get('prof').map(r=>r.comandancia)
+  ].filter(Boolean))].sort();
+  
+  ['fil-fie-com','fil-fic-com','fil-prof-com'].forEach(id=>{
+    const sel=document.getElementById(id);
+    if(!sel) return;
+    const cur=sel.value;
+    sel.innerHTML='<option value="">📍 Todas las estaciones</option>'+
+      coms.map(c=>`<option value="${c}" ${cur===c?'selected':''}>${c}</option>`).join('');
+  });
 }
 function exportarCSV(){
   const arr=DB.get('fie');if(!arr.length){alert('No hay datos.');return;}
@@ -1957,8 +2033,9 @@ function limpiarFIC(){
   document.getElementById('fic-tot-disp').textContent=0;
   clrTags('fic-inst-tags');
 }
-function renderFIC(){
-  const arr=DB.get('fic'),tb=document.getElementById('tbody-fic');
+function renderFIC(datos){
+  poblarSelectsEstacion();
+  const arr=datos||DB.get('fic'),tb=document.getElementById('tbody-fic');
   if(!arr.length){tb.innerHTML='<tr><td colspan="16" class="text-center py-5" style="color:var(--texto3);"><i class="bi bi-inbox" style="font-size:1.5rem;display:block;margin-bottom:6px;"></i>Sin registros.</td></tr>';return;}
   tb.innerHTML=arr.map((r,i)=>`<tr><td>${i+1}</td><td>${r.dia||''}</td><td>${r.mes||''}</td>
     <td><span class="badge-rojo">${r.num||''}</span></td><td>${r.horas||0}h</td>
@@ -1995,8 +2072,9 @@ document.getElementById('fProf').addEventListener('submit',e=>{
   renderProf();updateStats();showAl('alProf');limpiarProf();
 });
 function limpiarProf(){document.getElementById('fProf').reset();['pr-muj','pr-hom','pr-tot'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=0;});clrTags('pr-p-tags');}
-function renderProf(){
-  const arr=DB.get('prof'),tb=document.getElementById('tbody-prof');
+function renderProf(datos){
+  poblarSelectsEstacion();
+  const arr=datos||DB.get('prof'),tb=document.getElementById('tbody-prof');
   if(!arr.length){tb.innerHTML='<tr><td colspan="13" class="text-center py-5" style="color:var(--texto3);"><i class="bi bi-inbox" style="font-size:1.5rem;display:block;margin-bottom:6px;"></i>Sin registros.</td></tr>';return;}
   tb.innerHTML=arr.map((r,i)=>`<tr><td>${i+1}</td><td>${r.dia||''}</td><td>${r.mes||''}</td>
     <td>${r.horas||0}h</td><td>${r.instructor||'—'}</td><td>${r.procedencia||'—'}</td><td>${r.instalaciones||'—'}</td>
@@ -2220,9 +2298,10 @@ function updateStats(){
   }else tb.innerHTML='<tr><td colspan="4" class="text-center py-4" style="color:var(--texto3);">Sin datos.</td></tr>';
 
   // Tabla mensual — ahora incluye falsa alarma
-  const resMap={};MESES.forEach(m=>resMap[m]={fuego:0,agua:0,fauna:0,acc:0,socio:0,byr:0,ph:0,falsa:0,pob:0,tot:0});
+  const resMap={};MESES.forEach(m=>resMap[m]={fuego:0,agua:0,fauna:0,acc:0,socio:0,byr:0,ph:0,falsa:0,pob:0,tot:0,regs:0});
   fie.forEach(r=>{
     const m=r.mes;if(!resMap[m])return;
+    resMap[m].regs++;  // contar registros FIE del mes
     resMap[m].fuego+=(r.casa_hab||0)+(r.comercio||0)+(r.pastizales||0)+(r.forestales||0)+(r.vehiculares||0)+(r.explosiones||0)+(r.gas||0)+(r.sust_pel||0)+(r.mezclas||0)+(r.relleno_sanitario||0)+(r.derecho_de_via||0)+(r.via_publica||0);
     resMap[m].agua+=(r.inundaciones||0)+(r.cables||0)+(r.retiro_de_estructura||0)+(r.espectaculares||0)+(r.arboles||0);
     resMap[m].fauna+=(r.abejas||0)+(r.fauna_nociva||0)+(r.animales_domesticos||0);
@@ -2233,7 +2312,7 @@ function updateStats(){
     resMap[m].falsa+=(r.falsa_auto||0)+(r.falsa_maliciosa||0)+(r.falsa_error||0)+(r.falsa_sin_causa||0);
     resMap[m].pob+=r.totalPob||0;resMap[m].tot+=r.totalServ||0;
   });
-  const activosMes=MESES.filter(m=>resMap[m].tot>0);
+  const activosMes=MESES.filter(m=>resMap[m].regs>0);
   const tbr=document.getElementById('tbody-resumen');
   if(activosMes.length){
     tbr.innerHTML=activosMes.map(m=>`<tr>
@@ -2241,7 +2320,7 @@ function updateStats(){
       <td>${resMap[m].fauna}</td><td>${resMap[m].acc}</td><td>${resMap[m].socio}</td>
       <td>${resMap[m].byr}</td><td>${resMap[m].ph}</td><td>${resMap[m].falsa}</td>
       <td><span class="badge-verde">${resMap[m].pob}</span></td>
-      <td><span class="badge-rojo">${resMap[m].tot}</span></td>
+      <td><span class="badge-rojo" title="${resMap[m].tot} intervenciones">${resMap[m].regs}</span></td>
     </tr>`).join('');
   }else tbr.innerHTML='<tr><td colspan="11" class="text-center py-4" style="color:var(--texto3);">Captura servicios para ver estadísticas.</td></tr>';
 
@@ -3274,7 +3353,7 @@ function init(){
   const changed = fieFixed.some((r,i)=>r.totalServ !== fieExist[i]?.totalServ);
   if(changed) DB.set('fie', fieFixed);
   
-  updComs();renderP();renderU();renderFIE();renderFIC();renderProf();
+  updComs();renderP();renderU();renderFIE();renderFIC();renderProf();poblarSelectsEstacion();
   aplicarModo();renderUsuarios();renderHistorial();
   renderUserGrid();
 }
