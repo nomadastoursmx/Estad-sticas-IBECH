@@ -1716,6 +1716,16 @@ function calcServs(f){
   return FIE_COLS.reduce((s,c)=>s+(f[c]||0),0);
 }
 
+// Recalcula totalServ en un arreglo de registros FIE
+// Necesario cuando se cargan registros capturados con versiones anteriores del código
+function recalcularTotalServArr(arr){
+  return arr.map(r=>{
+    const correcto = calcServs(r) + ((r.ph_tipos||[]).length > 0 ? 1 : 0);
+    if(r.totalServ !== correcto) r.totalServ = correcto;
+    return r;
+  });
+}
+
 // ════════════════════════
 //  FIE SUBMIT
 // ════════════════════════
@@ -1727,6 +1737,13 @@ document.getElementById('fFIE').addEventListener('submit',e=>{
   const fields={};
   document.querySelectorAll('.fie-f').forEach(el=>fields[el.dataset.col]=parseInt(el.value)||0);
   const phTipos=[...document.querySelectorAll('.ph-tipo:checked')].map(c=>c.value);
+  // Validar que al menos un servicio/intervención esté registrado
+  const totalCampos = FIE_COLS.reduce((s,c)=>s+(fields[c]||0),0);
+  const totalValido = totalCampos + (phTipos.length > 0 ? 1 : 0);
+  if(totalValido === 0){
+    alert('⚠️ No puedes guardar un FIE sin registrar al menos un servicio.\n\nSelecciona una categoría e ingresa una cantidad mayor a 0 en algún subtipo de servicio.');
+    return;
+  }
   const rec={
     id:Date.now(),
     comandancia:DB.gs('com')||'—',
@@ -2349,7 +2366,7 @@ function cargarJSON(){
   reader.onload=e=>{try{
     const d=JSON.parse(e.target.result);
     if(d.personal)DB.set('personal',d.personal);if(d.unidades)DB.set('unidades',d.unidades);
-    if(d.fie)DB.set('fie',d.fie);if(d.fic)DB.set('fic',d.fic);if(d.prof)DB.set('prof',d.prof);
+    if(d.fie)DB.set('fie',recalcularTotalServArr(d.fie));if(d.fic)DB.set('fic',d.fic);if(d.prof)DB.set('prof',d.prof);
     if(d.comandancia)DB.ss('com',d.comandancia);
     logAccion('import','📥 JSON cargado: '+(d.fie?.length||0)+' FIE, '+(d.fic?.length||0)+' FIC — reemplazó datos','import');
     init();showAlMsg('al-json','al-json-msg',`Restaurado: ${d.fie?.length||0} FIE, ${d.fic?.length||0} FIC, ${d.prof?.length||0} Prof.`);
@@ -2637,6 +2654,7 @@ function mergeJSON(files) {
             r.comandancia = r.comandancia || comOrigen;
             const key = `${r.num}|${r.mes}|${r.comandancia}`;
             if (existIds.has(String(r.id)) || existKeys.has(key)) { skipFIE++; return; }
+            r.totalServ = calcServs(r) + ((r.ph_tipos||[]).length > 0 ? 1 : 0);
             existing.push(r); addedFIE++;
           });
           DB.set('fie', existing);
@@ -3250,6 +3268,12 @@ function showAlMsg(id,msgId,msg){const e=document.getElementById(id),m=document.
 //  INIT
 // ════════════════════════════════════════
 function init(){
+  // Recalcular totalServ en registros existentes (migración de versiones anteriores)
+  const fieExist = DB.get('fie');
+  const fieFixed = recalcularTotalServArr(fieExist);
+  const changed = fieFixed.some((r,i)=>r.totalServ !== fieExist[i]?.totalServ);
+  if(changed) DB.set('fie', fieFixed);
+  
   updComs();renderP();renderU();renderFIE();renderFIC();renderProf();
   aplicarModo();renderUsuarios();renderHistorial();
   renderUserGrid();
