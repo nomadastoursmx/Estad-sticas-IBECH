@@ -8,6 +8,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
   --rojo:#D32F2F;--rojo-d:#B71C1C;--rojo-l:#EF5350;--rojo-bg:rgba(211,47,47,.1);
@@ -991,6 +992,7 @@ textarea.form-control{resize:vertical;}
           WhatsApp</button>
         <button class="btn-rojo" onclick="descargarPDF()"><i class="bi bi-file-earmark-pdf-fill"></i>PDF</button>
         <button class="btn-rojo" style="background:var(--verde);box-shadow:none;" onclick="descargarCSVRep()"><i class="bi bi-file-earmark-spreadsheet-fill"></i>CSV</button>
+        <button class="btn-rojo" style="background:#1D6F42;box-shadow:none;" onclick="exportarExcelConcentrado()"><i class="bi bi-file-earmark-excel-fill"></i>Excel Concentrado</button>
         <button class="btn-outline" onclick="window.print()"><i class="bi bi-printer me-1"></i>Imprimir</button>
       </div>
       <div id="rep-alert" class="mt-3 d-none alert alert-ok p-2"><i class="bi bi-check-circle me-2"></i><span id="rep-msg"></span></div>
@@ -1331,6 +1333,7 @@ textarea.form-control{resize:vertical;}
         <div class="d-flex flex-wrap gap-2">
           <button class="btn-rojo" onclick="exportarJSONConcentrado()"><i class="bi bi-download"></i>JSON Concentrado</button>
           <button class="btn-rojo" style="background:var(--verde);box-shadow:none;" onclick="exportarCSVConcentrado()"><i class="bi bi-file-earmark-spreadsheet-fill"></i>CSV Completo</button>
+          <button class="btn-rojo" style="background:#1D6F42;box-shadow:none;" onclick="exportarExcelConcentrado()"><i class="bi bi-file-earmark-excel-fill"></i>Excel Concentrado</button>
           <button class="btn-rojo" style="background:#25D366;box-shadow:none;" onclick="compartirWAConcentrado()">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
             Resumen WhatsApp</button>
@@ -2918,6 +2921,50 @@ function compartirWAConcentrado() {
   window.open('https://wa.me/?text=' + encodeURIComponent(t), '_blank');
 }
 
+
+// ════════════════════════════════════════
+//  EXPORTAR EXCEL CONCENTRADO (Formato IBECH)
+// ════════════════════════════════════════
+function exportarExcelConcentrado(){
+  if(typeof XLSX === 'undefined'){alert('La librería Excel no está cargada. Verifica tu conexión a internet.');return;}
+  const fie=getFIEFiltrado(), fic=getFICFiltrado(), prof=getProfFiltrado();
+  const mes=document.getElementById('rep-mes')?.value||'';
+  const wb=XLSX.utils.book_new();
+  const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const BASES={'San Cristóbal de las Casas':'SCC','Tuxtla Gutiérrez 5° Norte':'TUXTLA','Tuxtla Gutiérrez 9° Sur':'TUXTLA 9 SUR','Tuxtla Gutiérrez Gried':'GRIED','Trinitaria':'Trinitaria','Tapachula':'Tapachula','Cintalapa':'Cintalapa','Venustiano Carranza':'V Carranza','Villaflores':'VILLAFLORES','Comitán':'Comitán','Ocosingo':'Ocosingo','Cacahoatan':'Cacahoatan','Ocozocoautla':'Ocozocoautla'};
+  const sumMap={};
+  fie.forEach(r=>{
+    const base=BASES[r.comandancia]||r.comandancia||'—';
+    const m=r.mes||'—';
+    const key=base+'|'+m;
+    if(!sumMap[key]) sumMap[key]={base,mes:m,casa_hab:0,comercio:0,pastizales:0,forestales:0,vehiculares:0,explosiones:0,gas:0,sust_pel:0,mezclas:0,inundaciones:0,cables:0,espectaculares:0,arboles:0,abejas:0,fauna_nociva:0,derrumbes:0,prehosp_acc:0,derrame:0,extricacion:0,concentracion:0,prevencion:0,prop_agua:0,byr_prehosp:0,byr_vida:0,byr_cuerpos:0,byr_atrapados:0,falsa:0,totalServ:0,muj_adultas:0,muj_mayores:0,muj_discap:0,hom_adultos:0,hom_mayores:0,hom_discap:0,ninas:0,ninos:0,lgbt:0,totalPob:0};
+    const s=sumMap[key];
+    ['casa_hab','comercio','pastizales','forestales','vehiculares','explosiones','gas','sust_pel','mezclas','inundaciones','cables','espectaculares','arboles','abejas','fauna_nociva','derrumbes','prehosp_acc','derrame','extricacion','concentracion','prevencion','prop_agua','byr_prehosp','byr_vida','byr_cuerpos','byr_atrapados','totalServ','muj_adultas','muj_mayores','muj_discap','hom_adultos','hom_mayores','hom_discap','ninas','ninos','lgbt','totalPob'].forEach(f=>s[f]+=(r[f]||0));
+    s.falsa+=(r.falsa_auto||0)+(r.falsa_maliciosa||0)+(r.falsa_error||0)+(r.falsa_sin_causa||0);
+  });
+  const fieDatos=Object.values(sumMap).sort((a,b)=>a.base.localeCompare(b.base)||MESES.indexOf(a.mes)-MESES.indexOf(b.mes));
+  const fieRows=fieDatos.map(s=>[s.base,s.mes,s.casa_hab,s.comercio,s.pastizales,s.forestales,s.vehiculares,s.explosiones,s.gas,s.sust_pel,s.mezclas,s.inundaciones,s.cables,s.espectaculares,s.arboles,s.abejas,s.fauna_nociva,s.derrumbes,s.prehosp_acc,s.derrame,s.extricacion,s.concentracion,s.prevencion,s.prop_agua,s.byr_prehosp,s.byr_vida,s.byr_cuerpos,s.byr_atrapados,s.falsa,s.totalServ,s.muj_adultas,s.muj_mayores,s.muj_discap,s.hom_adultos,s.hom_mayores,s.hom_discap,s.ninas,s.ninos,s.lgbt,s.totalPob]);
+  const fieHdr=[['ESTADISTICAS GENERALES ATENCION DE SERVICIOS ESTACIONES'],[],['2026','','SINIESTROS RELACIONADOS CON FUEGO','','','','','','','','','SINIESTROS RELACIONADOS CON AGUA Y AIRE','','','','RETIRO Y CAPTURA DE FAUNA','','ACCIDENTES','','','','SOCIOORGANIZATIVO','','','','BUSQUEDA Y RESCATE DE VICTIMAS','','','','','POBLACION BENEFICIADA'],[],['Base','Mes','CASA HABITACION','INCENDIO DE COMERCIO O INDUSTRIA','PASTIZALES','FORESTALES','INCENDIOS VEHICULARES','EXPLOSIONES','FUGAS DE GAS','SUSTANCIAS PELIGROSAS','MEZCLAS INFLAMABLES','INUNDACIONES O ENCHARCAMIENTOS','CABLES CAIDOS Y CORTO CIRCUITO','ESPECTACULARES CAIDOS','SECCIONAR ARBOLES','RETIRO DE ABEJAS','CAPTURA DE FAUNA NOCIVA','DERRUMBES','ACCIDENTES TERRESTRES (ATENCION PREHOSPITALARIA)','ATENCION DE DERRAME O FUGA DE MATERIALES PELIGROSOS','EXTRICACION VEHICULAR','CONCENTRACION MASIVA','SERVICIOS DE PREVENCION','SERVICIOS PROPORCIONAR AGUA','ATENCION PREHOSPITALARIA (BYR)','BUSQUEDA Y RESCATE DE PERSONAS CON VIDA','RECUPERACION DE CUERPOS SIN VIDA','PERSONAS ATRAPADAS','FALSA ALARMA','TOTAL DE SERVICIOS MENSUAL','MUJERES MAYOR DE 16 Y MENOR DE 60','MUJERES ADULTAS MAYORES','MUJERES CON DISCAPACIDAD','HOMBRES MAYOR DE 16 Y MENOR DE 60','HOMBRES ADULTOS MAYORES','HOMBRES CON DISCAPACIDAD','NINAS MENOS DE 16','NINOS MENOS DE 16','LGBT','TOTAL POBLACION']];
+  const fieTotal=['TOTAL','TOTAL',...Array.from({length:38},(_,i)=>fieRows.reduce((sum,r)=>sum+(Number(r[i+2])||0),0))];
+  const wsFIE=XLSX.utils.aoa_to_sheet([...fieHdr,...fieRows,fieTotal]);
+  XLSX.utils.book_append_sheet(wb,wsFIE,'Servicios FIE');
+
+  const ficHdr=[['CURSOS, TALLERES Y/O CAPACITACIONES OTORGADAS POR LA BRIGADA PRIMER RESPUESTA IBECH 2026'],[],['CURSOS Y/O CAPACITACIONES','','','','','BENEFICIARIOS','','','','','DE LOS BENEFICIARIOS SE ATENDIERON'],['MES','BASE','No. cursos','Duracion en Hrs.','Temas','Mujeres','Hombres','Ninas','Ninos','TOTAL','P. C/DISCAPACIDAD','LGTB+']];
+  const ficRows=fic.map(r=>[r.mes||'',BASES[r.comandancia]||r.comandancia||'',1,r.horas||0,r.tema||'',r.mujeres||0,r.hombres||0,r.ninas||0,r.ninos||0,r.total||0,r.discap||0,r.lgbt||0]);
+  const ficTotal=['TOTAL','',fic.length,fic.reduce((s,r)=>s+(Number(r.horas)||0),0),'',fic.reduce((s,r)=>s+(r.mujeres||0),0),fic.reduce((s,r)=>s+(r.hombres||0),0),fic.reduce((s,r)=>s+(r.ninas||0),0),fic.reduce((s,r)=>s+(r.ninos||0),0),fic.reduce((s,r)=>s+(r.total||0),0),fic.reduce((s,r)=>s+(r.discap||0),0),fic.reduce((s,r)=>s+(r.lgbt||0),0)];
+  const wsFIC=XLSX.utils.aoa_to_sheet([...ficHdr,...ficRows,ficTotal]);
+  XLSX.utils.book_append_sheet(wb,wsFIC,'Autoproteccion');
+
+  const profHdr=[['CURSOS, TALLERES Y/O CAPACITACIONES PARA LA PROFESIONALIZACION BOMBERIL'],[],['CURSOS, TALLERES, CAPACITACIONES Y/O ACTUALIZACIONES RECIBIDAS','','','','','','','BENEFICIARIOS'],['MES','BASE','NO. CURSOS','INSTRUCTOR','PROCEDENCIA','INSTALACIONES','Tema','Mujeres','Hombres','TOTAL']];
+  const profRows=prof.map(r=>[r.mes||'',BASES[r.comandancia]||r.comandancia||'',1,r.instructor||'',r.procedencia||'',r.instalaciones||'',r.tema||'',r.mujeres||0,r.hombres||0,r.total||0]);
+  const profTotal=['TOTAL','',prof.length,'','','','',prof.reduce((s,r)=>s+(r.mujeres||0),0),prof.reduce((s,r)=>s+(r.hombres||0),0),prof.reduce((s,r)=>s+(r.total||0),0)];
+  const wsProf=XLSX.utils.aoa_to_sheet([...profHdr,...profRows,profTotal]);
+  XLSX.utils.book_append_sheet(wb,wsProf,'Profesionalizacion');
+
+  XLSX.writeFile(wb,'Concentrado_IBECH_'+(mes||'Completo')+'_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  logAccion('export','Excel Concentrado IBECH exportado — '+fie.length+' FIE, '+fic.length+' FIC, '+prof.length+' Prof.','export');
+  showAlMsg('rep-alert','rep-msg','Excel Concentrado descargado correctamente.');
+}
 
 function showAl(id){const e=document.getElementById(id);if(!e)return;e.classList.remove('d-none');setTimeout(()=>e.classList.add('d-none'),3500);}
 function showAlMsg(id,msgId,msg){const e=document.getElementById(id),m=document.getElementById(msgId);if(e&&m){m.textContent=msg;e.classList.remove('d-none');setTimeout(()=>e.classList.add('d-none'),4000);}}
