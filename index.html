@@ -414,12 +414,6 @@ textarea.form-control{resize:vertical;}
       <label for="sel-com">Comandancia</label>
       <select id="sel-com" onchange="cambiarCom()">
         <option value="">— Seleccionar —</option>
-        <option>Tuxtla Gutiérrez 5° Norte</option><option>Tuxtla Gutiérrez 9° Sur</option>
-        <option>Tuxtla Gutiérrez Gried</option><option>Villaflores</option>
-        <option>San Cristóbal de las Casas</option><option>Tapachula</option>
-        <option>Comitán</option><option>Ocosingo</option><option>Venustiano Carranza</option>
-        <option>Cintalapa</option><option>Ocozocoautla</option><option>Cacahoatan</option>
-        <option>Trinitaria</option>
       </select>
     </div>
     <span id="reloj" class="reloj-txt no-print"></span>
@@ -765,7 +759,7 @@ textarea.form-control{resize:vertical;}
     <div style="overflow-x:auto;">
       <table class="table tbl">
         <thead>
-          <tr><th>#</th><th>Día</th><th>Mes</th><th>No.FIE</th><th>Hora</th><th>Comandancia</th><th>Dirección</th><th>Tipos</th><th>Personal</th><th>Serv.</th><th>Pob.</th><th>Acciones</th></tr>
+          <tr><th>#</th><th>Día</th><th>Mes</th><th>No.FIE</th><th>Hora</th><th>Comandancia</th><th>Subcategoría</th><th>Tipos</th><th>Personal</th><th>Serv.</th><th>Pob.</th><th>Acciones</th></tr>
         </thead>
         <tbody id="tbody-fie">
           <tr><td colspan="12" class="text-center py-5" style="color:var(--texto3);"><i class="bi bi-inbox" style="font-size:1.5rem;display:block;margin-bottom:6px;"></i>Sin registros.</td></tr>
@@ -1385,6 +1379,45 @@ textarea.form-control{resize:vertical;}
     <p>Gestión de usuarios y accesos del sistema IBECH. Solo visible para administradores.</p>
   </div>
 
+  <!-- Gestión de Comandancias -->
+  <div class="card-dark mb-4">
+    <div class="card-head d-flex justify-content-between align-items-center">
+      <span class="title"><i class="bi bi-geo-alt-fill" style="color:var(--rojo-l);"></i>Gestión de Comandancias</span>
+      <span class="badge-azul" id="cnt-coms">0 comandancias</span>
+    </div>
+    <div class="card-body">
+      <!-- Formulario agregar -->
+      <div class="d-flex gap-2 mb-3">
+        <input type="text" class="form-control form-control-sm" id="nueva-com-input" placeholder="Nombre de la nueva comandancia..." style="max-width:340px;"/>
+        <button class="btn-rojo" onclick="agregarComandancia()"><i class="bi bi-plus-lg"></i>Agregar</button>
+      </div>
+      <div id="al-com" class="mb-2 d-none alert alert-ok p-2"><i class="bi bi-check-circle me-2"></i><span id="al-com-msg"></span></div>
+      <!-- Lista de comandancias -->
+      <div id="lista-coms" class="d-flex flex-wrap gap-2"></div>
+    </div>
+  </div>
+
+  <!-- Modal editar comandancia -->
+  <div class="modal fade modal-dark" id="modalEditCom" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Editar Comandancia</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="edit-com-idx"/>
+          <label class="form-label">Nombre</label>
+          <input type="text" class="form-control form-control-sm" id="edit-com-nombre"/>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost px-3 py-1" data-bs-dismiss="modal">Cancelar</button>
+          <button class="btn-rojo" onclick="guardarEdicionComandancia()"><i class="bi bi-save-fill"></i>Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Crear usuario -->
   <div class="card-dark mb-4">
     <div class="card-head"><span class="title"><i class="bi bi-person-plus-fill"></i>Crear Nuevo Usuario</span></div>
@@ -1414,12 +1447,6 @@ textarea.form-control{resize:vertical;}
             <label class="form-label">Comandancia</label>
             <select class="form-select form-select-sm" id="nu-com">
               <option value="">— Todas —</option>
-              <option>Tuxtla Gutiérrez 5° Norte</option><option>Tuxtla Gutiérrez 9° Sur</option>
-              <option>Tuxtla Gutiérrez Gried</option><option>Villaflores</option>
-              <option>San Cristóbal de las Casas</option><option>Tapachula</option>
-              <option>Comitán</option><option>Ocosingo</option><option>Venustiano Carranza</option>
-              <option>Cintalapa</option><option>Ocozocoautla</option><option>Cacahoatan</option>
-              <option>Trinitaria</option>
             </select>
           </div>
         </div>
@@ -1463,12 +1490,6 @@ textarea.form-control{resize:vertical;}
             <div class="col-12"><label class="form-label">Comandancia</label>
               <select class="form-select form-select-sm" id="eu-com">
                 <option value="">— Todas —</option>
-                <option>Tuxtla Gutiérrez 5° Norte</option><option>Tuxtla Gutiérrez 9° Sur</option>
-                <option>Tuxtla Gutiérrez Gried</option><option>Villaflores</option>
-                <option>San Cristóbal de las Casas</option><option>Tapachula</option>
-                <option>Comitán</option><option>Ocosingo</option><option>Venustiano Carranza</option>
-                <option>Cintalapa</option><option>Ocozocoautla</option><option>Cacahoatan</option>
-                <option>Trinitaria</option>
               </select></div>
           </div>
         </div>
@@ -1580,7 +1601,11 @@ function updComs(){
   const v=DB.gs('com')||'No seleccionada';
   ['lbl-com','fie-com','fic-com','prof-com'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=v;});
   const sel=document.getElementById('sel-com');
-  if(sel&&DB.gs('com'))sel.value=DB.gs('com');
+  if(sel){
+    const coms=getComs();
+    const cur=DB.gs('com');
+    sel.innerHTML='<option value="">— Seleccionar —</option>'+coms.map(c=>`<option value="${c}" ${cur===c?'selected':''}>${c}</option>`).join('');
+  }
 }
 
 // ════════════════════════
@@ -1832,6 +1857,124 @@ function limpiarFIE(){
 const CAT_LABEL={'fuego':'🔥','agua':'💧','fauna':'🐝','acc':'🚗','socio':'👥','byr':'🔍','ph':'🚑','falsa':'🚨'};
 const CAT_COLOR_MAP={fuego:'#D32F2F',agua:'#1565C0',fauna:'#2E7D32',acc:'#E65100',socio:'#6A1B9A',byr:'#F57F17',ph:'#0277BD',falsa:'#558B2F'};
 
+// Mapa de columnas a etiquetas legibles para subcategoría
+const SUBCOL_LABELS={
+  casa_hab:'Casa Habitación',comercio:'Comercio/Industria',pastizales:'Pastizales',forestales:'Forestales',
+  vehiculares:'Vehículos',explosiones:'Explosiones',gas:'Fugas de Gas',sust_pel:'Sust. Peligrosas',
+  mezclas:'Mezclas Inflamables',relleno_sanitario:'Relleno Sanitario',derecho_de_via:'Derecho de Vía',via_publica:'Vía Pública',
+  inundaciones:'Inundaciones',cables:'Cables Caídos',retiro_de_estructura:'Retiro de Estructura',
+  espectaculares:'Espectaculares',arboles:'Árboles',
+  abejas:'Abejas',fauna_nociva:'Fauna Nociva',animales_domesticos:'Animales Domésticos',
+  prehosp_acc:'Atención PH',derrame:'Derrame/Fuga',extricacion:'Extricación',derrumbes:'Derrumbes',
+  concentracion:'Concentración',prevencion:'Prevención',prop_agua:'Agua',
+  byr_prehosp:'PH BYR',byr_vida:'Con Vida',byr_cuerpos:'Cuerpos',byr_atrapados:'Atrapados',
+  falsa_auto:'Alarma Automática',falsa_maliciosa:'Llamada Maliciosa',falsa_error:'Error de Terceros',falsa_sin_causa:'Sin Causa'
+};
+
+function getSubcategoria(r){
+  // Reúne todos los subtipos con valor > 0
+  const activos=FIE_COLS.filter(c=>(r[c]||0)>0).map(c=>SUBCOL_LABELS[c]||c);
+  // Agrega tipos PH si aplica
+  if((r.ph_tipos||[]).length>0) activos.push(...r.ph_tipos);
+  if(!activos.length) return '—';
+  // Muestra máximo 2 y el resto como "+N"
+  if(activos.length<=2) return activos.join(', ');
+  return activos.slice(0,2).join(', ')+` +${activos.length-2}`;
+}
+
+// ════════════════════════
+//  COMANDANCIAS CRUD
+// ════════════════════════
+const COMS_DEFAULT=[
+  'Tuxtla Gutiérrez 5° Norte','Tuxtla Gutiérrez 9° Sur','Tuxtla Gutiérrez Gried',
+  'Villaflores','San Cristóbal de las Casas','Tapachula','Comitán',
+  'Ocosingo','Venustiano Carranza','Cintalapa','Ocozocoautla','Cacahoatan','Trinitaria'
+];
+
+function getComs(){
+  const stored=DB.get('comandancias');
+  if(!stored||!stored.length){DB.set('comandancias',COMS_DEFAULT);return COMS_DEFAULT;}
+  return stored;
+}
+
+function renderComs(){
+  const coms=getComs();
+  document.getElementById('cnt-coms').textContent=coms.length+' comandancia'+(coms.length!==1?'s':'');
+  const wrap=document.getElementById('lista-coms');
+  if(!wrap)return;
+  if(!coms.length){wrap.innerHTML='<div style="color:var(--texto3);font-size:.85rem;">Sin comandancias registradas.</div>';return;}
+  wrap.innerHTML=coms.map((c,i)=>`
+    <div style="display:inline-flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--borde2);border-radius:var(--radio-sm);padding:5px 10px;font-size:.82rem;color:var(--texto);">
+      <i class="bi bi-geo-alt-fill" style="color:var(--rojo-l);font-size:.75rem;"></i>
+      <span>${c}</span>
+      <button class="btn-icon verde" style="width:22px;height:22px;font-size:.7rem;" onclick="abrirEditarCom(${i})" title="Editar"><i class="bi bi-pencil"></i></button>
+      <button class="btn-icon" style="width:22px;height:22px;font-size:.7rem;" onclick="eliminarCom(${i})" title="Eliminar"><i class="bi bi-trash"></i></button>
+    </div>`).join('');
+  // Actualizar todos los selects de comandancia en el sistema
+  poblarSelectsComs();
+}
+
+function poblarSelectsComs(){
+  const coms=getComs();
+  const opts='<option value="">— Todas —</option>'+coms.map(c=>`<option value="${c}">${c}</option>`).join('');
+  // Topbar
+  const selTop=document.getElementById('sel-com');
+  if(selTop){const v=selTop.value;selTop.innerHTML='<option value="">— Seleccionar —</option>'+coms.map(c=>`<option value="${c}">${c}</option>`).join('');selTop.value=v;}
+  // Admin: crear usuario / editar usuario
+  ['nu-com','eu-com'].forEach(id=>{const s=document.getElementById(id);if(s){const v=s.value;s.innerHTML=opts;s.value=v;}});
+}
+
+function agregarComandancia(){
+  const inp=document.getElementById('nueva-com-input');
+  const nombre=inp.value.trim();
+  if(!nombre){alert('Ingresa el nombre de la comandancia.');return;}
+  const coms=getComs();
+  if(coms.map(c=>c.toLowerCase()).includes(nombre.toLowerCase())){alert('Ya existe una comandancia con ese nombre.');return;}
+  coms.push(nombre);
+  DB.set('comandancias',coms);
+  inp.value='';
+  logAccion('admin',`📍 Comandancia agregada: ${nombre}`,'admin');
+  renderComs();
+  showAlMsg('al-com','al-com-msg',`Comandancia "${nombre}" agregada.`);
+}
+
+function abrirEditarCom(idx){
+  const coms=getComs();
+  document.getElementById('edit-com-idx').value=idx;
+  document.getElementById('edit-com-nombre').value=coms[idx]||'';
+  new bootstrap.Modal(document.getElementById('modalEditCom')).show();
+}
+
+function guardarEdicionComandancia(){
+  const idx=parseInt(document.getElementById('edit-com-idx').value);
+  const nombre=document.getElementById('edit-com-nombre').value.trim();
+  if(!nombre){alert('El nombre no puede estar vacío.');return;}
+  const coms=getComs();
+  const anterior=coms[idx];
+  coms[idx]=nombre;
+  DB.set('comandancias',coms);
+  // Actualizar registros existentes que tenían el nombre anterior
+  ['fie','fic','prof'].forEach(k=>{
+    const arr=DB.get(k).map(r=>{if(r.comandancia===anterior)r.comandancia=nombre;return r;});
+    DB.set(k,arr);
+  });
+  const usuarios=DB.get('usuarios').map(u=>{if(u.comandancia===anterior)u.comandancia=nombre;return u;});
+  DB.set('usuarios',usuarios);
+  logAccion('admin',`✏️ Comandancia editada: "${anterior}" → "${nombre}"`,'admin');
+  renderComs();
+  bootstrap.Modal.getInstance(document.getElementById('modalEditCom'))?.hide();
+}
+
+function eliminarCom(idx){
+  const coms=getComs();
+  const nombre=coms[idx];
+  if(!confirm(`¿Eliminar la comandancia "${nombre}"?\n\nLos registros que usen esta comandancia no se borrarán, pero quedarán sin comandancia asignada.`))return;
+  coms.splice(idx,1);
+  DB.set('comandancias',coms);
+  logAccion('admin',`🗑 Comandancia eliminada: ${nombre}`,'admin');
+  renderComs();
+}
+
 function renderFIE(datos){
   poblarSelectsEstacion();
   const arr=datos||DB.get('fie');
@@ -1844,7 +1987,7 @@ function renderFIE(datos){
       <td><span class="badge-rojo">${r.num||''}</span></td>
       <td>${r.hora||'—'}</td>
       <td style="font-size:.77rem;">${r.comandancia||'—'}</td>
-      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.dir||''}">${r.dir||'—'}</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${getSubcategoria(r)}">${getSubcategoria(r)||'—'}</td>
       <td style="font-size:.9rem;">${cats||'—'}</td>
       <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.personal||''}">${r.personal||'—'}</td>
       <td><span class="badge-rojo">${r.totalServ||0}</span></td>
@@ -3415,9 +3558,9 @@ function init(){
   const changed = fieFixed.some((r,i)=>r.totalServ !== fieExist[i]?.totalServ);
   if(changed) DB.set('fie', fieFixed);
   
-  updComs();renderP();renderU();renderFIE();renderFIC();renderProf();poblarSelectsEstacion();
+  updComs();renderP();renderU();renderFIE();renderFIC();renderProf();poblarSelectsEstacion();poblarSelectsComs();
   aplicarModo();renderUsuarios();renderHistorial();
-  renderUserGrid();
+  renderUserGrid();renderComs();
 }
 
 // Auto-refresh de vista al cambiar de pestaña
@@ -3429,7 +3572,7 @@ document.addEventListener('shown.bs.tab', function(e){
   else if(target==='#t-stats'){updateStats();buildFiltroBar();}
   else if(target==='#t-config'){renderP();renderU();}
   else if(target==='#t-concentrador') renderEstaciones();
-  else if(target==='#t-admin') renderUsuarios();
+  else if(target==='#t-admin') {renderUsuarios();renderComs();}
   else if(target==='#t-historial') renderHistorial();
   else if(target==='#t-ajustes'){
     setN('sys-p',DB.get('personal').length);setN('sys-u',DB.get('unidades').length);
